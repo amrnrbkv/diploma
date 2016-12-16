@@ -1,5 +1,35 @@
 <!DOCTYPE html>
-<html><body>
- <canvas width="800" height="600" id="c"></canvas>
- <script src="main.js"></script>
-</body></html>
+<html>
+  <body onload = "start()">
+    <canvas width="800" height="600" id="c"></canvas>
+
+    <script id="vShader" type="glsl">
+
+      attribute vec3 a_vertex; // vertex position
+
+      void main(void){
+        gl_Position = vec4(a_vertex, 1.0);
+      }
+
+
+    </script>
+
+
+    <script id="fShader" type="glsl">
+
+      precision mediump float;
+
+      void main (void){
+
+        gl_FragColor = vec4(0.0, 0.0, 1.0, 1.0);
+      }
+
+
+    </script>
+
+
+
+    <script src="main.js"></script>
+
+  </body>
+</html>
