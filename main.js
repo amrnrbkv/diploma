@@ -54,6 +54,7 @@ window.onload = function(){
         alert("An error occurred while linking the shaderProgram program: " + gl.getProgramInfoLog(shaderProgram));
       }
 
+      var uniformLoc = gl.getUniformLocation(shaderProgram, "matrix_");
 
       gl.useProgram(shaderProgram);
 
@@ -72,6 +73,18 @@ window.onload = function(){
       var red = 0;
       var timeElapsed = 0;
 
+      var location = vec3.create();
+      var rotation = 0;
+
+
+
+      var translateMatrix4x4 = mat4.create();
+      var rotateMatrix4x4 = mat4.create();
+
+
+
+
+
 
 
       function frame() {
@@ -83,6 +96,21 @@ window.onload = function(){
         timeElapsed+= diff;
         gl.clear(gl.COLOR_BUFFER_BIT);
 
+        location[0]+= 0.005;
+
+        if(rotation > 2 * Math.PI){
+          rotation = 0;
+        } else {
+          rotation+= 0.1046;
+        }
+
+
+        mat4.fromTranslation(translateMatrix4x4, location);
+        mat4.fromZRotation(rotateMatrix4x4, rotation);
+
+        mat4.mul(translateMatrix4x4, translateMatrix4x4, rotateMatrix4x4);
+
+        gl.uniformMatrix4fv(uniformLoc, gl.FALSE, translateMatrix4x4);
 
         gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0);
         requestAnimationFrame(frame);
