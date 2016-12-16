@@ -3,8 +3,7 @@ function start(){
 
   var canvas = document.getElementById("c");
   var gl = canvas.getContext("webgl");
-  gl.clearColor(1.0, 1.0, 0.0, 1.0);
-  gl.clear(gl.COLOR_BUFFER_BIT);
+  gl.clearColor(1.0, 0.43, 0.0, 1.0);
   //
   var coordinates = new Float32Array([-1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0]);
   var cBuffer = gl.createBuffer();
@@ -56,16 +55,17 @@ function start(){
   gl.vertexAttribPointer(0, 3, gl.FLOAT, gl.FALSE, Float32Array.BYTES_PER_ELEMENT * 3, 0);
 
 
-  gl.drawArrays(gl.TRIANGLES, 0, 3);
+  // gl.drawArrays(gl.TRIANGLES, 0, 3);
 
 
-
+  gl.enableVertexAttribArray(0);
 
 
 
   var t0 = performance.now();
   var red = 0;
   var timeElapsed = 0;
+
 
 
   function frame() {
@@ -75,6 +75,7 @@ function start(){
 
 
     timeElapsed+= diff;
+    gl.clear(gl.COLOR_BUFFER_BIT);
 
 
     gl.drawArrays(gl.TRIANGLES, 0, 3);
@@ -83,6 +84,6 @@ function start(){
 
   }
 
+frame();
 
-    frame();
 }
