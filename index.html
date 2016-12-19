@@ -6,9 +6,13 @@
     <script id="vShader" type="glsl">
 
       attribute vec3 a_vertex; // vertex position
+      attribute vec2 tex_;
+      varying vec2 temp_;
       uniform mat4 matrix_;
+
       void main(void){
         gl_Position = matrix_ * vec4(a_vertex, 1.0);
+        temp_ = tex_;
       }
 
 
@@ -18,10 +22,11 @@
     <script id="fShader" type="glsl">
 
       precision mediump float;
+      varying vec2 temp_;
+      uniform sampler2D texture_;
 
       void main (void){
-
-        gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
+        gl_FragColor = texture2D(texture_, temp_);
       }
 
 
