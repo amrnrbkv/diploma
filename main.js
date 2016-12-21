@@ -1,25 +1,20 @@
-window.onload = function(){
+window.onload = function() {
 
+      var loadingStatus = 0;
 
       var canvas = document.getElementById("c");
       var gl = canvas.getContext("webgl");
       gl.clearColor(0.5, 0.5, 0.5, 1.0);
+      gl.enable(gl.DEPTH_TEST);
+      gl.clearDepth(1);
       //
-      var coordinates = new Float32Array([-0.5, 0.5, 0.0, 1.0, -0.5, -0.5, 0.0, 0.0, 0.5, -0.5, 1.0, 0.0, 0.5, 0.5, 1.0, 1.0]);
-      var elements = new Uint16Array([0,1,2,2,3,0]);
-      var cBuffer = gl.createBuffer();
-      var elementBuffer = gl.createBuffer();
 
       var textureIndex = gl.createTexture();
 
       var img = new Image();
-      img.src = "textures/cat.png";
 
-      gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
-      gl.bufferData(gl.ARRAY_BUFFER, coordinates, gl.STATIC_DRAW);
-
-      gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, elementBuffer);
-      gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, elements, gl.STATIC_DRAW);
+      img.src = "textures/monkey.png";
+      loadingStatus++;
 
 
 
@@ -67,15 +62,11 @@ window.onload = function(){
       gl.useProgram(shaderProgram);
 
 
-      gl.vertexAttribPointer(0, 2, gl.FLOAT, gl.FALSE, Float32Array.BYTES_PER_ELEMENT * 4, 0);
-      gl.vertexAttribPointer(1, 2, gl.FLOAT, gl.FALSE, Float32Array.BYTES_PER_ELEMENT * 4, Float32Array.BYTES_PER_ELEMENT*2);
 
 
       // gl.drawArrays(gl.TRIANGLES, 0, 3);
 
 
-      gl.enableVertexAttribArray(0);
-      gl.enableVertexAttribArray(1);
 
 
       var t0 = performance.now();
@@ -87,8 +78,58 @@ window.onload = function(){
 
 
 
-      var translateMatrix4x4 = mat4.create();
-      var rotateMatrix4x4 = mat4.create();
+
+      var rotateZMatrix4x4 = mat4.create();
+      var rotateXMatrix4x4 = mat4.create();
+      var resultMatrix4x4 = mat4.create();
+
+
+              var qwerty = new XMLHttpRequest();
+              qwerty.open("GET", "models/monkey.xam", true);
+              qwerty.responseType = "arraybuffer";
+              qwerty.send();
+              loadingStatus++;
+
+
+
+              var numberOfElements = null;
+
+              qwerty.onreadystatechange = function() {
+
+                if(qwerty.readyState === XMLHttpRequest.DONE){
+                  var data = new DataView(qwerty.response);
+                  var indexOfElements = data.getUint32(0, true);
+                  var modelElements = new Uint16Array(qwerty.response, indexOfElements);
+                  var modelCoordinates = new Float32Array(qwerty.response, 4, (indexOfElements - Uint32Array.BYTES_PER_ELEMENT)/Float32Array.BYTES_PER_ELEMENT);
+                  numberOfElements = (data.byteLength - indexOfElements)/Uint16Array.BYTES_PER_ELEMENT;
+
+
+
+                  var modelCoordinatesBuffer = gl.createBuffer();
+                  gl.bindBuffer(gl.ARRAY_BUFFER, modelCoordinatesBuffer);
+                  gl.bufferData(gl.ARRAY_BUFFER, modelCoordinates, gl.STATIC_DRAW);
+
+                  var modelElementsBuffer = gl.createBuffer();
+                  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, modelElementsBuffer);
+                  gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, modelElements, gl.STATIC_DRAW);
+
+                  gl.vertexAttribPointer(0, 3, gl.FLOAT, gl.FALSE, Float32Array.BYTES_PER_ELEMENT * 5, 0);
+                  gl.vertexAttribPointer(1, 2, gl.FLOAT, gl.FALSE, Float32Array.BYTES_PER_ELEMENT * 5, Float32Array.BYTES_PER_ELEMENT * 3);
+
+
+                  gl.enableVertexAttribArray(0);
+                  gl.enableVertexAttribArray(1);
+
+
+
+                  loadingStatus--;
+                }
+
+                // else {
+                //   alert("Something wrong with requesting of resource!!!");
+                // }
+              };
+
 
 
 
@@ -105,42 +146,85 @@ window.onload = function(){
 
             gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
 
+
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
 
             gl.uniform1i(uniformLoc_, 0);
 
-            var t1 = performance.now();
-            var diff = t1 - t0;
-            t0 = performance.now();
 
-            function frame() {
-                timeElapsed+= diff;
-                gl.clear(gl.COLOR_BUFFER_BIT);
-
-                location[0]+= 0.005;
-
-                if(rotation > 2 * Math.PI){
-                  rotation = 0;
-                } else {
-                  rotation+= 0.1046;
-                }
+            loadingStatus--;
 
 
-                mat4.fromTranslation(translateMatrix4x4, location);
-                mat4.fromZRotation(rotateMatrix4x4, rotation);
 
-                mat4.mul(translateMatrix4x4, translateMatrix4x4, rotateMatrix4x4);
+      }
 
-                gl.uniformMatrix4fv(uniformLoc, gl.FALSE, translateMatrix4x4);
 
-                gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0);
-                requestAnimationFrame(frame);
+
+
+
+
+      var t1 = performance.now();
+      var diff = t1 - t0;
+      t0 = performance.now();
+
+
+
+      var perspectiveMatrix4x4 = mat4.create();
+
+      mat4.perspective(perspectiveMatrix4x4, 1.57, 800/600, 0.25, 50.0);
+
+      function frame() {
+
+        if(loadingStatus > 0){
+          gl.clearColor(0.0,0.0,0.0,1.0);
+          gl.clear(gl.COLOR_BUFFER_BIT);
+
         }
 
-          frame();
+        else{
 
-     }
+
+          timeElapsed+= diff;
+          gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+          location[0]+= 0.005;
+
+          if(rotation > 2 * Math.PI){
+            rotation = 0;
+          } else {
+            rotation+= 0.023;
+          }
+
+
+
+          mat4.fromZRotation(rotateZMatrix4x4, rotation);
+          mat4.fromXRotation(rotateXMatrix4x4, rotation);
+
+          // mat4.mul(resultMatrix4x4, perspectiveMatrix4x4, rotateXMatrix4x4);
+
+          mat4.translate(resultMatrix4x4, perspectiveMatrix4x4, vec3.fromValues(0.0, 0.0, -1.5));
+
+          mat4.mul(resultMatrix4x4, resultMatrix4x4, rotateXMatrix4x4);
+          mat4.mul(resultMatrix4x4, resultMatrix4x4, rotateZMatrix4x4);
+
+
+
+
+          gl.uniformMatrix4fv(uniformLoc, gl.FALSE, resultMatrix4x4);
+
+          gl.drawElements(gl.TRIANGLES, numberOfElements, gl.UNSIGNED_SHORT, 0);
+
+        }
+
+
+        requestAnimationFrame(frame);
+
+      }
+
+
+        frame();
+
 
 }
