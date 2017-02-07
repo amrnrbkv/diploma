@@ -1,3 +1,6 @@
+// window.location.reload(true);
+
+
 window.onload = function() {
 
       var loadingStatus = 0;
@@ -75,7 +78,7 @@ window.onload = function() {
 
       var location = vec3.create();
       var rotation = 0;
-
+      var cameraPosition = vec3.create();
 
 
 
@@ -93,6 +96,15 @@ window.onload = function() {
 
 
               var numberOfElements = null;
+
+
+
+
+
+
+
+
+
 
               qwerty.onreadystatechange = function() {
 
@@ -138,6 +150,12 @@ window.onload = function() {
 
 
 
+
+
+
+
+
+
        img.onload = function() {
 
             gl.activeTexture(gl.TEXTURE0);
@@ -155,10 +173,7 @@ window.onload = function() {
 
 
             loadingStatus--;
-
-
-
-      }
+          }
 
 
 
@@ -175,6 +190,25 @@ window.onload = function() {
 
       mat4.perspective(perspectiveMatrix4x4, 1.57, 800/600, 0.25, 50.0);
 
+
+
+
+
+
+
+
+
+
+      canvas.addEventListener('keydown', function(event) {
+
+
+        if (event.key === 'w') {
+          cameraPosition[2]-= 0.05;
+        }
+
+      }, false);
+
+
       function frame() {
 
         if(loadingStatus > 0){
@@ -186,8 +220,13 @@ window.onload = function() {
         else{
 
 
+
+
+
+
           timeElapsed+= diff;
           gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
 
           location[0]+= 0.005;
 
@@ -204,7 +243,9 @@ window.onload = function() {
 
           // mat4.mul(resultMatrix4x4, perspectiveMatrix4x4, rotateXMatrix4x4);
 
-          mat4.translate(resultMatrix4x4, perspectiveMatrix4x4, vec3.fromValues(0.0, 0.0, -1.5));
+          // mat4.translate(resultMatrix4x4, perspectiveMatrix4x4, vec3.fromValues(0.0, 0.0, -1.5));
+          mat4.translate(resultMatrix4x4, perspectiveMatrix4x4, cameraPosition);
+
 
           mat4.mul(resultMatrix4x4, resultMatrix4x4, rotateXMatrix4x4);
           mat4.mul(resultMatrix4x4, resultMatrix4x4, rotateZMatrix4x4);
