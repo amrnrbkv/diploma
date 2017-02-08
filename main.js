@@ -191,22 +191,55 @@ window.onload = function() {
       mat4.perspective(perspectiveMatrix4x4, 1.57, 800/600, 0.25, 50.0);
 
 
+      var isWKeyPressed, isAKeyPressed, isSKeyPressed, isDKeyPressed;
+       isWKeyPressed = isAKeyPressed = isSKeyPressed = isDKeyPressed = false;
 
 
+      window.onkeydown = function(event) {
+        switch(event.key){
+          case 'w':
+            isWKeyPressed = true;
+            break;
+          case 'a':
+            isAKeyPressed = true;
+            break;
 
+          case 's':
+            isSKeyPressed = true;
+            break;
 
+          case 'd':
+            isDKeyPressed = true;
+            break;
 
-
-
-
-      canvas.addEventListener('keydown', function(event) {
-
-
-        if (event.key === 'w') {
-          cameraPosition[2]-= 0.05;
         }
 
-      }, false);
+      };
+
+
+      window.onkeyup = function(event) {
+        switch(event.key){
+          case 'w':
+            isWKeyPressed = false;
+            break;
+          case 'a':
+            isAKeyPressed = false;
+            break;
+
+          case 's':
+            isSKeyPressed = false;
+            break;
+
+          case 'd':
+            isDKeyPressed = false;
+            break;
+
+        }
+      };
+
+
+
+      var cameraSpeed = 0.05;
 
 
       function frame() {
@@ -225,6 +258,25 @@ window.onload = function() {
 
 
           timeElapsed+= diff;
+
+
+          if (isWKeyPressed) {
+            cameraPosition[2] -= cameraSpeed * diff;
+          }
+
+          if (isSKeyPressed) {
+            cameraPosition[2] += cameraSpeed * diff;
+          }
+
+          if (isAKeyPressed) {
+            cameraPosition[0] -= cameraSpeed * diff;
+          }
+
+          if (isDKeyPressed) {
+            cameraPosition[0] += cameraSpeed * diff;
+          }
+
+
           gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
 
@@ -244,7 +296,7 @@ window.onload = function() {
           // mat4.mul(resultMatrix4x4, perspectiveMatrix4x4, rotateXMatrix4x4);
 
           // mat4.translate(resultMatrix4x4, perspectiveMatrix4x4, vec3.fromValues(0.0, 0.0, -1.5));
-          mat4.translate(resultMatrix4x4, perspectiveMatrix4x4, cameraPosition);
+          mat4.translate(resultMatrix4x4, perspectiveMatrix4x4, vec3.fromValues(-cameraPosition[0], -cameraPosition[1], -cameraPosition[2]));
 
 
           mat4.mul(resultMatrix4x4, resultMatrix4x4, rotateXMatrix4x4);
