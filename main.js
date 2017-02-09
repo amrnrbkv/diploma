@@ -200,17 +200,22 @@ window.onload = function() {
           case 'w':
             isWKeyPressed = true;
             break;
+
+
           case 'a':
             isAKeyPressed = true;
             break;
+
 
           case 's':
             isSKeyPressed = true;
             break;
 
+
           case 'd':
             isDKeyPressed = true;
             break;
+
 
         }
 
@@ -222,6 +227,7 @@ window.onload = function() {
           case 'w':
             isWKeyPressed = false;
             break;
+
           case 'a':
             isAKeyPressed = false;
             break;
@@ -240,6 +246,43 @@ window.onload = function() {
 
 
       var cameraSpeed = 0.05;
+
+
+
+
+
+
+      //PointerLock API --- Start
+      canvas.onclick = function() {
+        canvas.requestPointerLock();
+      };
+
+
+
+      document.addEventListener('pointerlockchange', lockChangeAlert, false);
+
+
+      function lockChangeAlert() {
+        if (document.pointerLockElement === canvas) {
+          console.log('The pointer lock status is now locked');
+          document.addEventListener("mousemove", updatePosition, false);
+        } else {
+          console.log('The pointer lock status is now unlocked');
+          document.removeEventListener("mousemove", updatePosition, false);
+        }
+      }
+
+
+
+
+
+      function updatePosition(event) {
+        cameraPosition[0] += event.movementX * 0.05;
+        cameraPosition[1] += event.movementY * 0.05;
+
+
+      }
+      //PointerLock API --- End
 
 
       function frame() {
