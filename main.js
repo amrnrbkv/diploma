@@ -273,16 +273,44 @@ window.onload = function() {
       }
 
 
-
+      var onYDegree = 0, onXDegree = 0;
 
 
       function updatePosition(event) {
-        cameraPosition[0] += event.movementX * 0.05;
-        cameraPosition[1] += event.movementY * 0.05;
+        onYDegree += event.movementX;
+        onXDegree -= event.movementY;
+
+
+        if(onYDegree > 360 || onYDegree < -360){
+          onYDegree %= 360;
+        }
+
+
+        if(onXDegree > 90){
+          onXDegree = 90;
+
+        }
+        else if (onXDegree < -90) {
+          onXDegree = -90;
+        }
 
 
       }
+
       //PointerLock API --- End
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
       function frame() {
@@ -294,10 +322,6 @@ window.onload = function() {
         }
 
         else{
-
-
-
-
 
 
           timeElapsed+= diff;
@@ -320,6 +344,10 @@ window.onload = function() {
           }
 
 
+
+
+
+
           gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
 
@@ -333,17 +361,20 @@ window.onload = function() {
 
 
 
+
           mat4.fromZRotation(rotateZMatrix4x4, rotation);
           mat4.fromXRotation(rotateXMatrix4x4, rotation);
 
           // mat4.mul(resultMatrix4x4, perspectiveMatrix4x4, rotateXMatrix4x4);
 
           // mat4.translate(resultMatrix4x4, perspectiveMatrix4x4, vec3.fromValues(0.0, 0.0, -1.5));
+          mat4.rotateX(resultMatrix4x4, perspectiveMatrix4x4, (onXDegree/180) * Math.PI);
+          mat4.rotateY(resultMatrix4x4, resultMatrix4x4, (onYDegree/180) * Math.PI);
           mat4.translate(resultMatrix4x4, perspectiveMatrix4x4, vec3.fromValues(-cameraPosition[0], -cameraPosition[1], -cameraPosition[2]));
 
 
-          mat4.mul(resultMatrix4x4, resultMatrix4x4, rotateXMatrix4x4);
-          mat4.mul(resultMatrix4x4, resultMatrix4x4, rotateZMatrix4x4);
+          // mat4.mul(resultMatrix4x4, resultMatrix4x4, rotateXMatrix4x4);
+          // mat4.mul(resultMatrix4x4, resultMatrix4x4, rotateZMatrix4x4);
 
 
 
