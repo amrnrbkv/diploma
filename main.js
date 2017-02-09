@@ -16,7 +16,7 @@ window.onload = function() {
 
       var img = new Image();
 
-      img.src = "textures/monkey.png";
+      img.src = "textures/cubemap_texture.png";
       loadingStatus++;
 
 
@@ -88,7 +88,7 @@ window.onload = function() {
 
 
               var qwerty = new XMLHttpRequest();
-              qwerty.open("GET", "models/monkey.xam", true);
+              qwerty.open("GET", "models/cubemap8x8.xam", true);
               qwerty.responseType = "arraybuffer";
               qwerty.send();
               loadingStatus++;
@@ -106,36 +106,50 @@ window.onload = function() {
 
 
 
-              qwerty.onreadystatechange = function() {
-
-                if(qwerty.readyState === XMLHttpRequest.DONE){
-                  var data = new DataView(qwerty.response);
-                  var indexOfElements = data.getUint32(0, true);
-                  var modelElements = new Uint16Array(qwerty.response, indexOfElements);
-                  var modelCoordinates = new Float32Array(qwerty.response, 4, (indexOfElements - Uint32Array.BYTES_PER_ELEMENT)/Float32Array.BYTES_PER_ELEMENT);
-                  numberOfElements = (data.byteLength - indexOfElements)/Uint16Array.BYTES_PER_ELEMENT;
 
 
 
-                  var modelCoordinatesBuffer = gl.createBuffer();
-                  gl.bindBuffer(gl.ARRAY_BUFFER, modelCoordinatesBuffer);
-                  gl.bufferData(gl.ARRAY_BUFFER, modelCoordinates, gl.STATIC_DRAW);
-
-                  var modelElementsBuffer = gl.createBuffer();
-                  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, modelElementsBuffer);
-                  gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, modelElements, gl.STATIC_DRAW);
-
-                  gl.vertexAttribPointer(0, 3, gl.FLOAT, gl.FALSE, Float32Array.BYTES_PER_ELEMENT * 5, 0);
-                  gl.vertexAttribPointer(1, 2, gl.FLOAT, gl.FALSE, Float32Array.BYTES_PER_ELEMENT * 5, Float32Array.BYTES_PER_ELEMENT * 3);
 
 
-                  gl.enableVertexAttribArray(0);
-                  gl.enableVertexAttribArray(1);
+                qwerty.onreadystatechange = function() {
+
+                  if(qwerty.readyState === XMLHttpRequest.DONE){
+                    var data = new DataView(qwerty.response);
+                    var indexOfElements = data.getUint32(0, true);
+                    var modelElements = new Uint16Array(qwerty.response, indexOfElements);
+                    var modelCoordinates = new Float32Array(qwerty.response, 4, (indexOfElements - Uint32Array.BYTES_PER_ELEMENT)/Float32Array.BYTES_PER_ELEMENT);
+                    numberOfElements = (data.byteLength - indexOfElements)/Uint16Array.BYTES_PER_ELEMENT;
 
 
 
-                  loadingStatus--;
-                }
+                    var modelCoordinatesBuffer = gl.createBuffer();
+                    gl.bindBuffer(gl.ARRAY_BUFFER, modelCoordinatesBuffer);
+                    gl.bufferData(gl.ARRAY_BUFFER, modelCoordinates, gl.STATIC_DRAW);
+
+                    var modelElementsBuffer = gl.createBuffer();
+                    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, modelElementsBuffer);
+                    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, modelElements, gl.STATIC_DRAW);
+
+                    gl.vertexAttribPointer(0, 3, gl.FLOAT, gl.FALSE, Float32Array.BYTES_PER_ELEMENT * 5, 0);
+                    gl.vertexAttribPointer(1, 2, gl.FLOAT, gl.FALSE, Float32Array.BYTES_PER_ELEMENT * 5, Float32Array.BYTES_PER_ELEMENT * 3);
+
+
+                    gl.enableVertexAttribArray(0);
+                    gl.enableVertexAttribArray(1);
+
+
+
+                    loadingStatus--;
+                  }
+
+
+
+
+
+
+
+
+
 
                 // else {
                 //   alert("Something wrong with requesting of resource!!!");
@@ -278,7 +292,7 @@ window.onload = function() {
 
       function updatePosition(event) {
         onYDegree += event.movementX;
-        onXDegree -= event.movementY;
+        onXDegree += event.movementY;
 
 
         if(onYDegree > 360 || onYDegree < -360){
@@ -370,7 +384,7 @@ window.onload = function() {
           // mat4.translate(resultMatrix4x4, perspectiveMatrix4x4, vec3.fromValues(0.0, 0.0, -1.5));
           mat4.rotateX(resultMatrix4x4, perspectiveMatrix4x4, (onXDegree/180) * Math.PI);
           mat4.rotateY(resultMatrix4x4, resultMatrix4x4, (onYDegree/180) * Math.PI);
-          mat4.translate(resultMatrix4x4, perspectiveMatrix4x4, vec3.fromValues(-cameraPosition[0], -cameraPosition[1], -cameraPosition[2]));
+          mat4.translate(resultMatrix4x4, resultMatrix4x4, vec3.fromValues(-cameraPosition[0], -cameraPosition[1], -cameraPosition[2]));
 
 
           // mat4.mul(resultMatrix4x4, resultMatrix4x4, rotateXMatrix4x4);
