@@ -6,6 +6,8 @@ window.onload = function() {
       var loadingStatus = 0;
 
       var canvas = document.getElementById("c");
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
       var gl = canvas.getContext("webgl");
       gl.clearColor(0.5, 0.5, 0.5, 1.0);
       gl.enable(gl.DEPTH_TEST);
@@ -181,7 +183,7 @@ window.onload = function() {
 
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
 
             gl.uniform1i(uniformLoc_, 0);
 
@@ -202,7 +204,7 @@ window.onload = function() {
 
       var perspectiveMatrix4x4 = mat4.create();
 
-      mat4.perspective(perspectiveMatrix4x4, 1.57, 800/600, 0.25, 50.0);
+      mat4.perspective(perspectiveMatrix4x4, 1.57, canvas.width/canvas.height, 0.25, 50.0);
 
 
       var isWKeyPressed, isAKeyPressed, isSKeyPressed, isDKeyPressed;
