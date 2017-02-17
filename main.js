@@ -7,7 +7,7 @@ window.onload = function() {
 
       var canvas = document.getElementById("c");
       canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
+      canvas.height =  window.innerHeight;
       var gl = canvas.getContext("webgl");
       gl.clearColor(0.5, 0.5, 0.5, 1.0);
       gl.enable(gl.DEPTH_TEST);
