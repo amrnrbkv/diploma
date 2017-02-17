@@ -319,7 +319,12 @@ window.onload = function() {
 
 
 
-
+      document.onresize = function() {
+        console.log(document.innerWidth + '  ' + document.innerHeight);
+        canvas.width = canvas.clientWidth;
+        canvas.height = canvas.clientHeight;
+        mat4.perspective(perspectiveMatrix4x4, 1.57, canvas.width/canvas.height, 0.25, 50.0);
+      };
 
 
 
@@ -332,7 +337,7 @@ window.onload = function() {
       function frame() {
 
         if(loadingStatus > 0){
-          gl.clearColor(0.0,0.0,0.0,1.0);
+          gl.clearColor(0.5,0.5,0.5,1.0);
           gl.clear(gl.COLOR_BUFFER_BIT);
 
         }
@@ -363,7 +368,7 @@ window.onload = function() {
 
 
 
-
+          gl.clearColor(0.0,0.0,0.0,1.0);
           gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
 
