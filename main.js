@@ -320,10 +320,10 @@ window.onload = function() {
 
 
       window.onresize = function() {
-        console.log(window.innerWidth + '  ' + window.innerHeight);
         canvas.width = canvas.clientWidth;
         canvas.height = canvas.clientHeight;
         mat4.perspective(perspectiveMatrix4x4, 1.57, canvas.width/canvas.height, 0.25, 50.0);
+        gl.viewport(0.0, 0.0, canvas.width, canvas.height);
       };
 
 
