@@ -4,6 +4,7 @@ var xaGraphic={
 	var      xaConstObjects;
 	var      xaNumOfDwnlds;
 	var      xaExternalCallBackFunc;
+	var      xaSimpleTexturedShader;
 	function xaCallBackIfReady(){
 		if(xaNumOfDwnlds===0){
 			xaExternalCallBackFunc();
@@ -40,6 +41,27 @@ var xaGraphic={
 		}
 		return img;
 	}
+	
+	function xaCompileShader(shaderNameIn, shaderTypeIn){
+		var returnValue           = gl.createShader(shaderTypeIn);
+		gl.shaderSource(returnValue,document.getElementById(shaderNameIn).text);
+		gl.compileShader(returnValue);
+		if (!gl.getShaderParameter(returnValue, gl.COMPILE_STATUS){
+			alert("An error occurred compiling the shader: " + gl.getShaderInfoLog(returnValue));  
+		}
+		return returnValue;
+	}
+	
+	function xaLinkShaderPrg(vShaderIn, fShaderIn){
+		var returnValue = gl.createProgram();
+		gl.attachShader(returnValue, vShaderIn);
+        gl.attachShader(returnValue, fShaderIn);
+		gl.linkProgram(returnValue);
+		if (!gl.getProgramParameter(returnValue, gl.LINK_STATUS)) {
+			alert("An error occurred while linking the shaderProgram program: " + gl.getProgramInfoLog(returnValue));
+		}
+		return returnValue;
+	}
 	function xaCreateConstObj(XAMAddressIn,TextureAddressIn){
 		var constObj = new Object();
 
@@ -64,20 +86,9 @@ var xaGraphic={
 
             //gl.uniform1i(uniformLoc_, 0);
 		});
-	    
-		
+		xaConstObjects.push(constObj);
 	}
-	
 
-
-	function xaPushConstObj(addressIn){
-		var constObj=new Object()
-		var XAMBuffs = xaDwnldXAM(addressIn,function(){
-			xaConstObjects.push(xaCreateConstObj(XAMBuffs));
-			
-			xaCallBackIfReady();
-		});
-	}
 	this.Initialize(canvasIn, callbackIn){
 		xaCanvas               = canvasIn;
 		xaCanvas.width         = window.innerWidth;
@@ -86,15 +97,29 @@ var xaGraphic={
 		xaExternalCallBackFunc = callbackIn;
 		xaConstObjects         = [];
 		xaNumOfDwnlds          = 0;
-		xaPushConstObj("models/cubemap8x8.xam");
+		//xaPushConstObj("models/cubemap8x8.xam");
+		xaSimpleTexturedShader = new Object();
+		xaSimpleTexturedShader.program = gl.createProgram();
+		xaLinkShaderPrg(xaCompileShader("vShader",gl.VERTEX_SHADER), xaCompileShader("fShader",gl.FRAGMENT_SHADER));
+		xaSimpleTexturedShader.matLoc  = xaSimpleTexturedShader.program(shaderProgram, "matrix_");
+		xaSimpleTexturedShader.texLoc  = xaSimpleTexturedShader.program(shaderProgram, "texture_");
 		
+		xaCreateConstObj("models/cubemap8x8.xam","textures/cubemap_texture.png");
+		
+		xaGL.clearColor(0.5, 0.5, 0.5, 1.0);
+		xaGL.enable(xaGL.DEPTH_TEST);
+		xaGL.clearDepth(1);
 	}
 	this.RenderFrame(){
+		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+		
+		gl.enableVertexAttribArray(0);
+		gl.enableVertexAttribArray(1);
+		gl.vertexAttribPointer(0, 3, gl.FLOAT, gl.FALSE, Float32Array.BYTES_PER_ELEMENT * 5, 0);
+		gl.vertexAttribPointer(1, 2, gl.FLOAT, gl.FALSE, Float32Array.BYTES_PER_ELEMENT * 5, Float32Array.BYTES_PER_ELEMENT * 3);
+		for (var i = 0; i < xaConstObjects.length; i++) {
+			
+		}
 		
 	}
-
-	
-	xaGL.clearColor(0.5, 0.5, 0.5, 1.0);
-	xaGL.enable(xaGL.DEPTH_TEST);
-	xaGL.clearDepth(1);
 }
