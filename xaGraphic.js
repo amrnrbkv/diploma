@@ -2,14 +2,17 @@ var xaGraphic={
 	var      xaCanvas;
 	var      xaGL;
 	var      xaConstObjects;
+	var      xaCamera;
 	var      xaNumOfDwnlds;
 	var      xaExternalCallBackFunc;
 	var      xaSimpleTexturedShader;
+	
 	function xaCallBackIfReady(){
 		if(xaNumOfDwnlds===0){
 			xaExternalCallBackFunc();
 		}
 	}
+	
 	function xaDwnldXAM(addressIn,callbackIn){
 		var request = new XMLHttpRequest();
 		request.open("GET", "addressIn", true);
@@ -99,12 +102,19 @@ var xaGraphic={
 		xaNumOfDwnlds          = 0;
 		//xaPushConstObj("models/cubemap8x8.xam");
 		xaSimpleTexturedShader = new Object();
+		xaCamera               = new Object();
 		xaSimpleTexturedShader.program = gl.createProgram();
 		xaLinkShaderPrg(xaCompileShader("vShader",gl.VERTEX_SHADER), xaCompileShader("fShader",gl.FRAGMENT_SHADER));
 		xaSimpleTexturedShader.matLoc  = xaSimpleTexturedShader.program(shaderProgram, "matrix_");
 		xaSimpleTexturedShader.texLoc  = xaSimpleTexturedShader.program(shaderProgram, "texture_");
 		
+		xaCamera.position   = vec3.fromValues(0,0,0);
+		xaCamera.rotationY  = 0;
+		xaCamera.rotationX  = 0;
+		
 		xaCreateConstObj("models/cubemap8x8.xam","textures/cubemap_texture.png");
+		
+		
 		
 		xaGL.clearColor(0.5, 0.5, 0.5, 1.0);
 		xaGL.enable(xaGL.DEPTH_TEST);
@@ -112,6 +122,9 @@ var xaGraphic={
 	}
 	this.RenderFrame(){
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+		
+		
+		
 		
 		gl.enableVertexAttribArray(0);
 		gl.enableVertexAttribArray(1);
