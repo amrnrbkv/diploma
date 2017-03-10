@@ -72,9 +72,9 @@ var xaGraphic={
 			constObj.arrBuff   = xaGL.createBuffer();
 			constObj.elemsBuff = xaGL.createBuffer();
 			constObj.numOfElems= XAMdata.numOfElems();
-			xaGL.bindBuffer(xaGL.ARRAY_BUFFER, XAMdata.modelCoors);
+			xaGL.bindBuffer(xaGL.ARRAY_BUFFER, constObj.arrBuff);
 			xaGL.bufferData(xaGL.ARRAY_BUFFER, XAMdata.modelCoors, xaGL.STATIC_DRAW);
-			xaGL.bindBuffer(xaGL.ELEMENT_ARRAY_BUFFER, XAMdata.modelElems);
+			xaGL.bindBuffer(xaGL.ELEMENT_ARRAY_BUFFER, constObj.elemsBuff);
 			xaGL.bufferData(xaGL.ELEMENT_ARRAY_BUFFER, XAMdata.modelElems, xaGL.STATIC_DRAW);
 			xaCallBackIfReady();
 		});
@@ -111,6 +111,8 @@ var xaGraphic={
 		xaCamera.position   = vec3.fromValues(0,0,0);
 		xaCamera.rotationY  = 0;
 		xaCamera.rotationX  = 0;
+		xaCamera.perspMat4  = mat4.create();
+		mat4.perspective(xaCamera.perspMat4, 1.57, xaCanvas.width/xaCanvas.height, 0.25, 50.0);
 		
 		xaCreateConstObj("models/cubemap8x8.xam","textures/cubemap_texture.png");
 		
@@ -122,17 +124,29 @@ var xaGraphic={
 	}
 	this.RenderFrame(){
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+		var resultMatrix = mat4.create();
+		mat4.rotateX(resultMatrix4x4, xaCamera.perspMat4, xaCamera.rotationX);
+		mat4.rotateY(resultMatrix4x4, resultMatrix4x4, xaCamera.rotationY);
+		mat4.translate(resultMatrix4x4, resultMatrix4x4, vec3.fromValues(-xaCamera.position[0], -xaCamera.position[1], -xaCamera.position[2]));
+
 		
 		
-		
-		
+		//
 		gl.enableVertexAttribArray(0);
 		gl.enableVertexAttribArray(1);
 		gl.vertexAttribPointer(0, 3, gl.FLOAT, gl.FALSE, Float32Array.BYTES_PER_ELEMENT * 5, 0);
 		gl.vertexAttribPointer(1, 2, gl.FLOAT, gl.FALSE, Float32Array.BYTES_PER_ELEMENT * 5, Float32Array.BYTES_PER_ELEMENT * 3);
+		//
+		gl.activeTexture(gl.TEXTURE0);
+		//
+		gl.useProgram(xaSimpleTexturedShader.program);
 		for (var i = 0; i < xaConstObjects.length; i++) {
-			
-		}
-		
+			gl.bindTexture(gl.TEXTURE_2D, xaConstObjects[i].texIndx);
+			gl.uniform1i(xaSimpleTexturedShader.texLoc, 0);
+			gl.uniformMatrix4fv(xaSimpleTexturedShader.matLoc, gl.FALSE, resultMatrix4x4);
+			xaGL.bindBuffer(xaGL.ARRAY_BUFFER, xaConstObjects[i].arrBuff);
+			xaGL.bindBuffer(xaGL.ELEMENT_ARRAY_BUFFER, xaConstObjects[i].elemsBuff);
+			gl.drawElements(gl.TRIANGLES, xaConstObjects[i].numOfElems, gl.UNSIGNED_SHORT, 0);
+		}	
 	}
 }
