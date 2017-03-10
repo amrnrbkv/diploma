@@ -35,23 +35,23 @@ window.onload = function() {
 
 
     window.onkeydown = function(event) {
-        switch (event.key) {
-            case 'w':
+        switch (event.code) {
+            case 'KeyW':
                 isWKeyPressed = true;
                 break;
 
 
-            case 'a':
+            case 'KeyA':
                 isAKeyPressed = true;
                 break;
 
 
-            case 's':
+            case 'KeyS':
                 isSKeyPressed = true;
                 break;
 
 
-            case 'd':
+            case 'KeyD':
                 isDKeyPressed = true;
                 break;
 
@@ -62,20 +62,20 @@ window.onload = function() {
 
 
     window.onkeyup = function(event) {
-        switch (event.key) {
-            case 'w':
+        switch (event.code) {
+            case 'KeyW':
                 isWKeyPressed = false;
                 break;
 
-            case 'a':
+            case 'KeyA':
                 isAKeyPressed = false;
                 break;
 
-            case 's':
+            case 'KeyS':
                 isSKeyPressed = false;
                 break;
 
-            case 'd':
+            case 'KeyD':
                 isDKeyPressed = false;
                 break;
 
@@ -115,15 +115,16 @@ window.onload = function() {
 
 
     function updatePosition(event) {
-        onYDegree += event.movementX*0.001;
-        onXDegree += event.movementY*0.001; 
+        onYDegree += event.movementX*0.002;
+        onXDegree += event.movementY*0.002; 
     }
 
     //PointerLock API --- End
 
-
-
-
+	//DEBUG
+	xaGraphic.MoveCamera(vec3.fromValues(0,1,0));
+	xaGraphic.RotateCamera(0.5,0.9);
+	//DEBUG_END
 
     requestAnimationFrame(frame);
 

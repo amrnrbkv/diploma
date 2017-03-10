@@ -1,6 +1,7 @@
 var xaGraphic = new function(){
 	var      xaCanvas;
 	var      xaGL;
+	var      xaEXTanisotropic;
 	var      xaConstObjects;
 	var      xaCamera;
 	var      xaDoublePI;
@@ -82,10 +83,14 @@ var xaGraphic = new function(){
 		var img = xaDwnldTexture(TextureAddressIn,function(){
 			constObj.texIndx = xaGL.createTexture();
             xaGL.bindTexture(xaGL.TEXTURE_2D, constObj.texIndx);
-            xaGL.texImage2D (xaGL.TEXTURE_2D, 0, xaGL.RGBA, xaGL.RGBA, xaGL.UNSIGNED_BYTE, img);
-            xaGL.texParameteri(xaGL.TEXTURE_2D, xaGL.TEXTURE_WRAP_S, xaGL.CLAMP_TO_EDGE);
-            xaGL.texParameteri(xaGL.TEXTURE_2D, xaGL.TEXTURE_WRAP_T, xaGL.CLAMP_TO_EDGE);
-            xaGL.texParameteri(xaGL.TEXTURE_2D, xaGL.TEXTURE_MIN_FILTER, xaGL.LINEAR);
+            xaGL.texParameteri(xaGL.TEXTURE_2D, xaGL.TEXTURE_WRAP_S, xaGL.REPEAT);
+            xaGL.texParameteri(xaGL.TEXTURE_2D, xaGL.TEXTURE_WRAP_T, xaGL.REPEAT);
+            xaGL.texParameteri(xaGL.TEXTURE_2D, xaGL.TEXTURE_MIN_FILTER, xaGL.LINEAR_MIPMAP_LINEAR);
+			
+			xaGL.texParameterf(xaGL.TEXTURE_2D, xaEXTanisotropic.TEXTURE_MAX_ANISOTROPY_EXT, 4);
+
+			xaGL.texImage2D (xaGL.TEXTURE_2D, 0, xaGL.RGBA, xaGL.RGBA, xaGL.UNSIGNED_BYTE, img);
+			xaGL.generateMipmap(xaGL.TEXTURE_2D);
 			xaCallBackIfReady();
 
 		});
@@ -97,6 +102,7 @@ var xaGraphic = new function(){
 		xaCanvas.width         = window.innerWidth;
 		xaCanvas.height        = window.innerHeight;
 		xaGL                   = xaCanvas.getContext("webgl");
+		xaEXTanisotropic       = xaGL.getExtension('EXT_texture_filter_anisotropic');
 		xaExternalCallBackFunc = callbackIn;
 		xaConstObjects         = [];
 		xaNumOfDwnlds          = 0;
@@ -118,7 +124,7 @@ var xaGraphic = new function(){
 		xaDoublePI = 2*Math.PI;
 		xaHalfPI   = Math.PI/2;
 		
-		xaCreateConstObj("models/cubemap8x8.xam","textures/cubemap_texture.png");
+		xaCreateConstObj("models/ring1.xam","textures/ring1.png");
 		
 		
 		
