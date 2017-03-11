@@ -3,6 +3,7 @@ var xaGraphic = new function(){
 	var      xaGL;
 	var      xaEXTanisotropic;
 	var      xaConstObjects;
+	var      xaSkyBox;
 	var      xaCamera;
 	var      xaDoublePI;
 	var      xaHalfPI;
@@ -10,6 +11,7 @@ var xaGraphic = new function(){
 	var      xaNumOfDwnlds;
 	var      xaExternalCallBackFunc;
 	var      xaSimpleTexturedShader;
+	var      xaSkyBoxShader;
 	
 	function xaCallBackIfReady(){
 		if(xaNumOfDwnlds==0){
@@ -33,6 +35,7 @@ var xaGraphic = new function(){
 				returnValue.numOfElems = (data.byteLength - indexOfElements)/Uint16Array.BYTES_PER_ELEMENT;
 				xaNumOfDwnlds--;
 				callbackIn();
+				xaCallBackIfReady();
 			}
 		}
 		return returnValue;
@@ -45,6 +48,7 @@ var xaGraphic = new function(){
 		img.onload = function(){
 			xaNumOfDwnlds--;
 			callbackIn();
+			xaCallBackIfReady();
 		}
 		return img;
 	}
@@ -67,6 +71,87 @@ var xaGraphic = new function(){
 			alert("An error occurred while linking the shaderProgram program: " + xaGL.getProgramInfoLog(programIn));
 		}
 	}
+	
+	function xaPrepareSkyBox()
+	{
+		xaSkyBox = new Object();
+		xaSkyBox.arrBuff   = xaGL.createBuffer();
+		var vertexRawData  = new Float32Array([
+		    -10,  10, -10,
+			-10, -10, -10,
+			 10, -10, -10,
+			 10, -10, -10,
+			 10,  10, -10,
+			-10,  10, -10,
+
+			-10, -10,  10,
+			-10, -10, -10,
+			-10,  10, -10,
+			-10,  10, -10,
+			-10,  10,  10,
+			-10, -10,  10,
+
+			 10, -10, -10,
+			 10, -10,  10,
+			 10,  10,  10,
+			 10,  10,  10,
+			 10,  10, -10,
+			 10, -10, -10,
+
+			-10, -10,  10,
+			-10,  10,  10,
+			 10,  10,  10,
+			 10,  10,  10,
+			 10, -10,  10,
+			-10, -10,  10,
+
+			-10,  10, -10,
+			 10,  10, -10,
+			 10,  10,  10,
+			 10,  10,  10,
+			-10,  10,  10,
+			-10,  10, -10,
+
+			-10, -10, -10,
+			-10, -10,  10,
+			 10, -10, -10,
+			 10, -10, -10,
+			-10, -10,  10,
+			 10, -10,  10]);
+			xaGL.bindBuffer(xaGL.ARRAY_BUFFER, xaSkyBox.arrBuff);
+			xaGL.bufferData(xaGL.ARRAY_BUFFER, vertexRawData, xaGL.STATIC_DRAW);
+			xaSkyBox.texIndx = xaGL.createTexture();
+			
+			var textureHandler = function(cubeSideIn,imageIn){
+				xaGL.bindTexture(xaGL.TEXTURE_CUBE_MAP, xaSkyBox.texIndx);
+				//xaGL.texParameteri(xaGL.TEXTURE_CUBE_MAP, xaGL.TEXTURE_MAG_FILTER, xaGL.NEAREST);
+				xaGL.texParameteri(xaGL.TEXTURE_CUBE_MAP, xaGL.TEXTURE_MIN_FILTER, xaGL.LINEAR);
+				xaGL.texParameteri(xaGL.TEXTURE_CUBE_MAP, xaGL.TEXTURE_WRAP_S, xaGL.CLAMP_TO_EDGE);
+				xaGL.texParameteri(xaGL.TEXTURE_CUBE_MAP, xaGL.TEXTURE_WRAP_T, xaGL.CLAMP_TO_EDGE);
+				//xaGL.texParameteri(xaGL.TEXTURE_CUBE_MAP, xaGL.TEXTURE_WRAP_R, xaGL.CLAMP_TO_EDGE);
+				xaGL.texImage2D (cubeSideIn, 0, xaGL.RGBA, xaGL.RGBA, xaGL.UNSIGNED_BYTE, imageIn);
+			}
+			
+
+			var imgNegZ = xaDwnldTexture("textures/skybox/-z.png",function(){
+				textureHandler(xaGL.TEXTURE_CUBE_MAP_NEGATIVE_Z,imgNegZ);
+			});
+			var imgPosZ = xaDwnldTexture("textures/skybox/+z.png",function(){
+				textureHandler(xaGL.TEXTURE_CUBE_MAP_POSITIVE_Z,imgPosZ);
+			});
+			var imgNegX = xaDwnldTexture("textures/skybox/-x.png",function(){
+				textureHandler(xaGL.TEXTURE_CUBE_MAP_NEGATIVE_X,imgNegX);
+			});
+			var imgPosX = xaDwnldTexture("textures/skybox/+x.png",function(){
+				textureHandler(xaGL.TEXTURE_CUBE_MAP_POSITIVE_X,imgPosX);
+			});
+			var imgNegY = xaDwnldTexture("textures/skybox/-y.png",function(){
+				textureHandler(xaGL.TEXTURE_CUBE_MAP_NEGATIVE_Y,imgNegY);
+			});
+			var imgPosY = xaDwnldTexture("textures/skybox/+y.png",function(){
+				textureHandler(xaGL.TEXTURE_CUBE_MAP_POSITIVE_Y,imgPosY);
+			});
+	}
 	function xaCreateConstObj(XAMAddressIn,TextureAddressIn){
 		var constObj = new Object();
 
@@ -78,7 +163,7 @@ var xaGraphic = new function(){
 			xaGL.bufferData(xaGL.ARRAY_BUFFER, XAMdata.modelCoors, xaGL.STATIC_DRAW);
 			xaGL.bindBuffer(xaGL.ELEMENT_ARRAY_BUFFER, constObj.elemsBuff);
 			xaGL.bufferData(xaGL.ELEMENT_ARRAY_BUFFER, XAMdata.modelElems, xaGL.STATIC_DRAW);
-			xaCallBackIfReady();
+			
 		});
 		var img = xaDwnldTexture(TextureAddressIn,function(){
 			constObj.texIndx = xaGL.createTexture();
@@ -91,7 +176,6 @@ var xaGraphic = new function(){
 
 			xaGL.texImage2D (xaGL.TEXTURE_2D, 0, xaGL.RGBA, xaGL.RGBA, xaGL.UNSIGNED_BYTE, img);
 			xaGL.generateMipmap(xaGL.TEXTURE_2D);
-			xaCallBackIfReady();
 
 		});
 		xaConstObjects.push(constObj);
@@ -108,6 +192,7 @@ var xaGraphic = new function(){
 		xaNumOfDwnlds          = 0;
 		//xaPushConstObj("models/cubemap8x8.xam");
 		xaSimpleTexturedShader = new Object();
+		xaSkyBoxShader         = new Object();
 		xaCamera               = new Object();
 		xaSimpleTexturedShader.program = xaGL.createProgram();
 		xaPrepareShaderPrg(xaCompileShader("vShader",xaGL.VERTEX_SHADER),
@@ -115,12 +200,22 @@ var xaGraphic = new function(){
 						   xaSimpleTexturedShader.program);
 		xaSimpleTexturedShader.matLoc  = xaGL.getUniformLocation(xaSimpleTexturedShader.program, "matrix_");
 		xaSimpleTexturedShader.texLoc  = xaGL.getUniformLocation(xaSimpleTexturedShader.program, "texture_");
+		
+		xaPrepareSkyBox();
+		xaSkyBoxShader.program = xaGL.createProgram();
+		xaPrepareShaderPrg(xaCompileShader("skyboxVShader",xaGL.VERTEX_SHADER),
+						   xaCompileShader("skyboxFShader",xaGL.FRAGMENT_SHADER),
+						   xaSkyBoxShader.program);
+		xaSkyBoxShader.matLoc = xaGL.getUniformLocation(xaSkyBoxShader.program, "projection");
+		xaSkyBoxShader.texLoc = xaGL.getUniformLocation(xaSkyBoxShader.program, "skybox");
+		
+		
 		xaWorldCenter       = vec3.fromValues(0,0,0);
 		xaCamera.position   = vec3.fromValues(0,0,0);
 		xaCamera.rotationY  = 0;
 		xaCamera.rotationX  = 0;
 		xaCamera.perspMat4  = mat4.create();
-		mat4.perspective(xaCamera.perspMat4, 1.57, xaCanvas.width/xaCanvas.height, 0.25, 50.0);
+		mat4.perspective(xaCamera.perspMat4, 1.13, xaCanvas.width/xaCanvas.height, 0.25, 50.0);
 		xaDoublePI = 2*Math.PI;
 		xaHalfPI   = Math.PI/2;
 		
@@ -129,7 +224,6 @@ var xaGraphic = new function(){
 		
 		
 		xaGL.clearColor(0.5, 0.5, 0.5, 1.0);
-		xaGL.enable(xaGL.DEPTH_TEST);
 		xaGL.clearDepth(1);
 		
 		window.onresize = function() {
@@ -144,18 +238,34 @@ var xaGraphic = new function(){
 		var resultMatrix = mat4.create();
 		mat4.rotateX(resultMatrix, xaCamera.perspMat4, xaCamera.rotationX);
 		mat4.rotateY(resultMatrix, resultMatrix, xaCamera.rotationY);
-		mat4.translate(resultMatrix, resultMatrix, vec3.fromValues(-xaCamera.position[0], -xaCamera.position[1], -xaCamera.position[2]));
+		
 
-		
-		
-		//
 		xaGL.enableVertexAttribArray(0);
-		xaGL.enableVertexAttribArray(1);
-		xaGL.vertexAttribPointer(0, 3, xaGL.FLOAT, xaGL.FALSE, Float32Array.BYTES_PER_ELEMENT * 5, 0);
-		xaGL.vertexAttribPointer(1, 2, xaGL.FLOAT, xaGL.FALSE, Float32Array.BYTES_PER_ELEMENT * 5, Float32Array.BYTES_PER_ELEMENT * 3);
-		//
+		
 		xaGL.activeTexture(xaGL.TEXTURE0);
+		//SKYBOX
+		xaGL.disable(xaGL.DEPTH_TEST);
+		xaGL.bindBuffer(xaGL.ARRAY_BUFFER, xaSkyBox.arrBuff);
+		xaGL.useProgram(xaSkyBoxShader.program);
+		xaGL.bindTexture(xaGL.TEXTURE_CUBE_MAP, xaSkyBox.texIndx);
+		xaGL.uniform1i(xaSkyBoxShader.texLoc, 0);
+		xaGL.uniformMatrix4fv(xaSkyBoxShader.matLoc, xaGL.FALSE, resultMatrix);
+		xaGL.vertexAttribPointer(0, 3, xaGL.FLOAT, xaGL.FALSE, Float32Array.BYTES_PER_ELEMENT * 3, 0);
+		xaGL.drawArrays(xaGL.TRIANGLES, 0, 36);
+		
 		//
+		mat4.translate(resultMatrix, resultMatrix, vec3.fromValues(-xaCamera.position[0], -xaCamera.position[1], -xaCamera.position[2]));
+		
+		
+		//
+		
+		xaGL.enableVertexAttribArray(1);
+		
+		//
+		xaGL.vertexAttribPointer(0, 3, xaGL.FLOAT, xaGL.FALSE, Float32Array.BYTES_PER_ELEMENT * 5, 0);
+		xaGL.vertexAttribPointer(1, 2, xaGL.FLOAT, xaGL.FALSE, Float32Array.BYTES_PER_ELEMENT * 5, Float32Array.BYTES_PER_ELEMENT * 3)
+		//
+		xaGL.enable(xaGL.DEPTH_TEST);
 		xaGL.useProgram(xaSimpleTexturedShader.program);
 		for (var i = 0; i < xaConstObjects.length; i++) {
 			xaGL.bindTexture(xaGL.TEXTURE_2D, xaConstObjects[i].texIndx);
@@ -163,6 +273,8 @@ var xaGraphic = new function(){
 			xaGL.uniformMatrix4fv(xaSimpleTexturedShader.matLoc, xaGL.FALSE, resultMatrix);
 			xaGL.bindBuffer(xaGL.ARRAY_BUFFER, xaConstObjects[i].arrBuff);
 			xaGL.bindBuffer(xaGL.ELEMENT_ARRAY_BUFFER, xaConstObjects[i].elemsBuff);
+			xaGL.vertexAttribPointer(0, 3, xaGL.FLOAT, xaGL.FALSE, Float32Array.BYTES_PER_ELEMENT * 5, 0);
+			xaGL.vertexAttribPointer(1, 2, xaGL.FLOAT, xaGL.FALSE, Float32Array.BYTES_PER_ELEMENT * 5, Float32Array.BYTES_PER_ELEMENT * 3)
 			xaGL.drawElements(xaGL.TRIANGLES, xaConstObjects[i].numOfElems, xaGL.UNSIGNED_SHORT, 0);
 		}	
 	}

@@ -35,6 +35,7 @@ window.onload = function() {
 	//Context2D
 	var context2D = canvas2.getContext('2d');
 	context2D.font = '28px sans';
+	context2D.fillStyle = "white";
 	//
 
     var isWKeyPressed, isAKeyPressed, isSKeyPressed, isDKeyPressed;
@@ -122,8 +123,8 @@ window.onload = function() {
 
 
     function updatePosition(event) {
-        onYDegree += event.movementX*0.002;
-        onXDegree += event.movementY*0.002; 
+        onYDegree += event.movementX*0.0015;
+        onXDegree += event.movementY*0.0015; 
     }
 
     //PointerLock API --- End

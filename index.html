@@ -35,6 +35,30 @@
 
 
     </script>
+	
+	<script id="skyboxVShader" type="glsl">
+		attribute vec3 position;
+		varying   vec3 TexCoords;
+
+		uniform mat4 projection;
+
+		void main()
+		{
+			gl_Position =   projection *vec4(position, 1.0);  
+			TexCoords = position;
+		}
+	</script>
+	
+	<script id="skyboxFShader" type="glsl">
+		precision mediump float;
+		varying   vec3 TexCoords;
+		uniform   samplerCube skybox;
+
+		void main()
+		{    
+			gl_FragColor = textureCube(skybox, TexCoords);
+		}
+	</script>
 
 
     <script src="main.js"></script>
