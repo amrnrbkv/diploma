@@ -19,16 +19,23 @@ window.onload = function() {
     t0 = performance.now();
 
 	
-	var canvas = document.getElementById("c");
+	var canvas  = document.getElementById("c");
+	var canvas2 = document.getElementById("c2");
     canvas.width = window.innerWidth;
     canvas.height =  window.innerHeight;
+	canvas2.width = window.innerWidth;
+    canvas2.height =  window.innerHeight;
+	
+	
 	loadingStatus++;
 	xaGraphic.Initialize(canvas,function(){
 		loadingStatus--;
 		console.log("xaGraphic Ready!");
 	});
-
-
+	//Context2D
+	var context2D = canvas2.getContext('2d');
+	context2D.font = '28px sans';
+	//
 
     var isWKeyPressed, isAKeyPressed, isSKeyPressed, isDKeyPressed;
     isWKeyPressed = isAKeyPressed = isSKeyPressed = isDKeyPressed = false;
@@ -90,7 +97,7 @@ window.onload = function() {
 
 
     //PointerLock API --- Start
-    canvas.onclick = function() {
+    document.onclick = function() {
         canvas.requestPointerLock();
     };
 
@@ -128,6 +135,10 @@ window.onload = function() {
 
     requestAnimationFrame(frame);
 
+	var temp1=performance.now();
+	var temp2=0;
+	var temp3=0;
+	
     function frame() {
 		var t1 = performance.now();
 		var diff = t1 - t0;
@@ -157,9 +168,24 @@ window.onload = function() {
 			xaGraphic.MoveCamera(cameraDislocation);
 			xaGraphic.RotateCamera(onXDegree,onYDegree);
 			xaGraphic.RenderFrame();
+			
+			context2D.clearRect(0, 0, canvas2.width, canvas2.height);
+			
+			temp1+=diff;
+			if(temp1>1000){
+				temp2=temp3;
+				temp3=0;
+				temp1=0;
+			}
+			temp3++;
+			
+			context2D.fillText(temp2+" FPS", 50, 100);
+			
 			onYDegree = 0;
 			onXDegree = 0;
         }
         requestAnimationFrame(frame);
     }
+	
+
 }
