@@ -30,12 +30,11 @@ window.onload = function() {
 	loadingStatus++;
 	xaGraphic.Initialize(canvas,function(){
 		loadingStatus--;
+		xaUI.SetLoadingScreen(false);
 		console.log("xaGraphic Ready!");
 	});
 	//Context2D
-	var context2D = canvas2.getContext('2d');
-	context2D.font = '28px sans';
-	context2D.fillStyle = "white";
+	xaUI.Initialize(canvas2);
 	//
 
     var isWKeyPressed, isAKeyPressed, isSKeyPressed, isDKeyPressed;
@@ -132,6 +131,10 @@ window.onload = function() {
 	//DEBUG
 	xaGraphic.MoveCamera(vec3.fromValues(0,1,0));
 	xaGraphic.RotateCamera(0.5,0.9);
+	
+	xaUI.SetFPSCounter(true);
+	
+	xaUI.SetLoadingScreen(true);
 	//DEBUG_END
 
     requestAnimationFrame(frame);
@@ -145,7 +148,7 @@ window.onload = function() {
 		var diff = t1 - t0;
 		t0 = t1;
 		timeElapsed += diff;
-
+		
         if (loadingStatus > 0) {
         } else {
 
@@ -170,21 +173,12 @@ window.onload = function() {
 			xaGraphic.RotateCamera(onXDegree,onYDegree);
 			xaGraphic.RenderFrame();
 			
-			context2D.clearRect(0, 0, canvas2.width, canvas2.height);
 			
-			temp1+=diff;
-			if(temp1>1000){
-				temp2=temp3;
-				temp3=0;
-				temp1=0;
-			}
-			temp3++;
-			
-			context2D.fillText(temp2+" FPS", 50, 100);
 			
 			onYDegree = 0;
 			onXDegree = 0;
         }
+		xaUI.RenderFrame(t1);
         requestAnimationFrame(frame);
     }
 	
