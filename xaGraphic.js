@@ -180,6 +180,7 @@ var xaGraphic = new function(){
 		});
 		xaConstObjects.push(constObj);
 	}
+	
 
 	this.Initialize = function(canvasIn, callbackIn){
 		xaCanvas               = canvasIn;

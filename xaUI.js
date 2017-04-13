@@ -28,6 +28,7 @@ var xaUI = new function(){
 		xaLoadingScreen.Flag = inTrueOrFalse;
 	}
 	
+	
 	this.RenderFrame=function(timeNowIn){
 		xaCtx2D.clearRect(0, 0, xaCanvas.width, xaCanvas.height);
 		//LOADING SCREEN

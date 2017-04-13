@@ -30,7 +30,7 @@ window.onload = function() {
 	loadingStatus++;
 	xaGraphic.Initialize(canvas,function(){
 		loadingStatus--;
-		xaUI.SetLoadingScreen(false);
+		//xaUI.SetLoadingScreen(false);
 		console.log("xaGraphic Ready!");
 	});
 	//Context2D
@@ -135,6 +135,9 @@ window.onload = function() {
 	xaUI.SetFPSCounter(true);
 	
 	xaUI.SetLoadingScreen(true);
+	
+	loadingStatus++;
+	setTimeout(function(){loadingStatus--; xaUI.SetLoadingScreen(false);},5000);
 	//DEBUG_END
 
     requestAnimationFrame(frame);
