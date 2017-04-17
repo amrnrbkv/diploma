@@ -1,3 +1,37 @@
-body {
-	background-color: #444444;
+@import url('https://fonts.googleapis.com/css?family=Mukta+Vaani');
+
+* { margin: 0; padding: 0;}
+
+body, html {
+  height:100%;
+  background: #FAFAFA;
+  font-family: 'Mukta Vaani', sans-serif;
+}
+
+button {
+  font-size: 50px;
+  color: white;
+  width: 350px;
+  border-radius: 10px;
+  border: 5px solid #069b0b;
+  background: #4CAF50;
+  font-family: 'Mukta Vaani', sans-serif;
+}
+
+
+button:hover {
+  background: white;
+  color: #4CAF50;
+}
+
+#c {
+    position:absolute;
+    width:100%;
+    height:100%;
+}
+
+#c2 {
+    position:absolute;
+    width:100%;
+    height:100%;
 }
