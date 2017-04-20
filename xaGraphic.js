@@ -191,6 +191,7 @@ var xaGraphic = new function(){
 		xaExternalCallBackFunc = callbackIn;
 		xaConstObjects         = [];
 		xaNumOfDwnlds          = 0;
+
 		//xaPushConstObj("models/cubemap8x8.xam");
 		xaSimpleTexturedShader = new Object();
 		xaSkyBoxShader         = new Object();
@@ -212,13 +213,14 @@ var xaGraphic = new function(){
 		
 		
 		xaWorldCenter       = vec3.fromValues(0,0,0);
+		xaDoublePI = 2*Math.PI;
+		xaHalfPI   = Math.PI/2;
 		xaCamera.position   = vec3.fromValues(0,0,0);
 		xaCamera.rotationY  = 0;
 		xaCamera.rotationX  = 0;
 		xaCamera.perspMat4  = mat4.create();
-		mat4.perspective(xaCamera.perspMat4, 1.13, xaCanvas.width/xaCanvas.height, 0.25, 50.0);
-		xaDoublePI = 2*Math.PI;
-		xaHalfPI   = Math.PI/2;
+		mat4.perspective(xaCamera.perspMat4, 1.0, xaCanvas.width/xaCanvas.height, 0.25, 50.0);
+
 		
 		xaCreateConstObj("models/ring1.xam","textures/ring1.png");
 		
@@ -230,7 +232,7 @@ var xaGraphic = new function(){
 		window.onresize = function() {
 			xaCanvas.width  = xaCanvas.clientWidth;
 			xaCanvas.height = xaCanvas.clientHeight;
-			mat4.perspective(xaCamera.perspMat4, 1.57, xaCanvas.width/xaCanvas.height, 0.25, 50.0);
+			mat4.perspective(xaCamera.perspMat4, 1.0, xaCanvas.width/xaCanvas.height, 0.25, 50.0);
 			xaGL.viewport(0.0, 0.0, xaCanvas.width, xaCanvas.height);
 		};
 	}
