@@ -2,10 +2,20 @@
 <html>
   <head>
     <link rel="stylesheet" href="style.css">
+
   </head>
   <body>
+
+
+    <div class="start-container">
+      <p>Enter your nickname here: </p> <input type="text" name="nickname" />
+      <button name="button" onclick="start()">Play</button>
+    </div>
+
+
+
     <canvas id="c"> </canvas>
-	<canvas id="c2"></canvas>
+	  <canvas id="c2"></canvas>
 
     <script id="vShader" type="glsl">
 
@@ -23,7 +33,7 @@
     </script>
 
 
-	
+
     <script id="fShader" type="glsl">
 
       precision mediump float;
@@ -36,7 +46,7 @@
 
 
     </script>
-	
+
 	<script id="skyboxVShader" type="glsl">
 		attribute vec3 position;
 		varying   vec3 TexCoords;
@@ -45,27 +55,27 @@
 
 		void main()
 		{
-			gl_Position =   projection *vec4(position, 1.0);  
+			gl_Position =   projection *vec4(position, 1.0);
 			TexCoords = position;
 		}
 	</script>
-	
+
 	<script id="skyboxFShader" type="glsl">
 		precision mediump float;
 		varying   vec3 TexCoords;
 		uniform   samplerCube skybox;
 
 		void main()
-		{    
+		{
 			gl_FragColor = textureCube(skybox, TexCoords);
 		}
 	</script>
 
 
     <script src="main.js"></script>
-	<script src="gl-matrix-min.js"></script>
-	<script src="xaGraphic.js"></script>
-	<script src="xaUI.js"></script>
+	  <script src="gl-matrix-min.js"></script>
+	  <script src="xaGraphic.js"></script>
+	  <script src="xaUI.js"></script>
 
   </body>
 </html>
