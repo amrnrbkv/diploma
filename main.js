@@ -1,5 +1,19 @@
 // window.location.reload(true);
-window.onload = function() {
+window.onload = function(){
+  var nickname = document.getElementByName("nickname");
+  if(nickname.value === ""){
+    nickname.value = "You hasn't typed your nickname!!!";
+    nickname.style.color = "red";
+    nickname.style.border = "5px solid red";
+  }
+
+  else {
+    document.getElementTagName("button").disabled = false;
+  }
+
+}
+
+var start = function() {
 
     var loadingStatus = 0;
 
@@ -18,19 +32,19 @@ window.onload = function() {
     var diff = t1 - t0;
     t0 = performance.now();
 
-	
+
 	var canvas  = document.getElementById("c");
 	var canvas2 = document.getElementById("c2");
     canvas.width = window.innerWidth;
     canvas.height =  window.innerHeight;
 	canvas2.width = window.innerWidth;
     canvas2.height =  window.innerHeight;
-	
-	
+
+
 	loadingStatus++;
 	xaGraphic.Initialize(canvas,function(){
 		loadingStatus--;
-		//xaUI.SetLoadingScreen(false);
+		xaUI.SetLoadingScreen(false);
 		console.log("xaGraphic Ready!");
 	});
 	//Context2D
@@ -123,7 +137,7 @@ window.onload = function() {
 
     function updatePosition(event) {
         onYDegree += event.movementX*0.0015;
-        onXDegree += event.movementY*0.0015; 
+        onXDegree += event.movementY*0.0015;
     }
 
     //PointerLock API --- End
@@ -131,13 +145,11 @@ window.onload = function() {
 	//DEBUG
 	xaGraphic.MoveCamera(vec3.fromValues(0,1,0));
 	xaGraphic.RotateCamera(0.5,0.9);
-	
+
 	xaUI.SetFPSCounter(true);
-	
+
 	xaUI.SetLoadingScreen(true);
-	
-	loadingStatus++;
-	setTimeout(function(){loadingStatus--; xaUI.SetLoadingScreen(false);},5000);
+
 	//DEBUG_END
 
     requestAnimationFrame(frame);
@@ -145,17 +157,17 @@ window.onload = function() {
 	var temp1=performance.now();
 	var temp2=0;
 	var temp3=0;
-	
+
     function frame() {
 		var t1 = performance.now();
 		var diff = t1 - t0;
 		t0 = t1;
 		timeElapsed += diff;
-		
+
         if (loadingStatus > 0) {
         } else {
 
-			
+
 			var cameraDislocation = vec3.create();
             if (isWKeyPressed) {
                 cameraDislocation[2] -= cameraSpeed * diff;
@@ -175,15 +187,15 @@ window.onload = function() {
 			xaGraphic.MoveCamera(cameraDislocation);
 			xaGraphic.RotateCamera(onXDegree,onYDegree);
 			xaGraphic.RenderFrame();
-			
-			
-			
+
+
+
 			onYDegree = 0;
 			onXDegree = 0;
         }
 		xaUI.RenderFrame(t1);
         requestAnimationFrame(frame);
     }
-	
+
 
 }
