@@ -368,12 +368,12 @@ var xaGraphic = new function(){
 		vec3.add(xaCamera.position, xaCamera.position, tempVec);
 	}
 	
-	this.SetPlayer(inPlayerID,inTrueOrFalse){
+	this.SetPlayer   = function(inPlayerID,inTrueOrFalse){
 		xaPlayersEntites[inPlayerID].isExistFlag=inTrueOrFalse;
 		
 	}
 	
-	this.UpdatePlayerPosition(inPlayerID, inPosition){
+	this.UpdatePlayerPosition   = function (inPlayerID, inPosition){
 		var player = xaPlayersEntites[inPlayerID];
 		vec3.copy(player.position, inPosition);
 		mat4.fromTranslation(player.matrix,inPosition);
