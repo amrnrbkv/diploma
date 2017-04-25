@@ -7,11 +7,20 @@
   <body>
 
 
-    <div class="start-container">
-      <p>Enter your nickname here: </p> <input type="text" name="nickname" />
-      <button name="button" onclick="start()">Play</button>
-    </div>
+    <div id="win">
+       <div class="overlay"></div>
+          <div class="visible">
+            <h2>Outside the ring</h2>
+            <div class="input_">
+              <label for="ip">IP-Address: </label>
+              <input id="ip" type="text" name="ip" placeholder=" Type IP address here">
+              <label for="nickname">Nickname:  </label>
+              <input id="nickname" type="text" name="nickname"  placeholder=" Enter your nickname here">
+            </div>
 
+            <button type="button" accesskey="g">Play</button>
+        </div>
+    </div>
 
 
     <canvas id="c"> </canvas>

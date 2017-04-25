@@ -8,21 +8,98 @@ body, html {
   font-family: 'Mukta Vaani', sans-serif;
 }
 
-button {
-  font-size: 50px;
-  color: white;
-  width: 350px;
-  border-radius: 10px;
-  border: 5px solid #069b0b;
-  background: #4CAF50;
+
+
+
+.overlay {
+	background: url(images/space.jpg);
+	position: fixed;
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: 0;
+	z-index: 1000;
+
+}
+
+.visible {
   font-family: 'Mukta Vaani', sans-serif;
+  background: linear-gradient(135deg, white, #FFE273);
+	position: fixed;
+	left: 50%;
+	top: 50%;
+	margin-top: -100px;
+	overflow: hidden;
+	z-index: 2000;
+	width: 500px;
+	padding: 0px;
+  height: 300px;
+	margin-left: -250px;
+  border-radius: 5px;
+
+}
+
+.visible h2 {
+  padding: 40px;
+  text-align: center;
+  text-shadow: 1px 1px 2px black, 0 0 1em grey;
+}
+
+.visible .input_ #ip {
+  border: 3px solid #0b83aa;
+  font-family: 'Mukta Vaani', sans-serif;
+  line-height: 30px;
+  font-size: 20px;
+
+}
+
+.visible .input_ #nickname {
+  border: 3px solid #0b83aa;
+  font-family: 'Mukta Vaani', sans-serif;
+  line-height: 30px;
+  font-size: 20px;
+
 }
 
 
-button:hover {
+.visible .input_ label{
+   font-family: 'Mukta Vaani', sans-serif;
+   font-size: 24px;
+   position: relative;
+   padding-left: 50px;
+ }
+
+ .input_ ip {
+
+   font-family: 'Mukta Vaani', sans-serif;
+   font-size: 1.5em;
+ }
+
+#win button {
+  border: 3px solid #0b83aa;
+  font-family: 'Mukta Vaani', sans-serif;
+  font-size: 25px;
+	line-height: 40px;
+	margin: 1.2em;
+	/*border: 2px solid #0099ff;*/
+	background: #1794e8;
+  color: #ffffff;
+  border-radius: 3px;
+  width: 200px;
+  position: relative;
+  margin-left: 150px;
+  box-shadow: 0px 0px 25px 5px rgba(0,0,0,0.5);
+}
+
+#win button[type="button"]:hover {
+	cursor: pointer;
   background: white;
-  color: #4CAF50;
+	color: #0b83aa;
+
 }
+
+
+
 
 #c {
     position:absolute;
