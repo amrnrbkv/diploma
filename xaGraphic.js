@@ -15,7 +15,35 @@ var xaGraphic = new function(){
 	var      xaSimpleTexturedShader;
 	var      xaSkyBoxShader;
 	
+	function xa3dParty_HSVtoRGB(h, s, v) {
+		//Written by Parthik Gosar,
+		//Modified by stackoverflow user Paul S.
+		var r, g, b, i, f, p, q, t;
+		if (arguments.length === 1) {
+			s = h.s, v = h.v, h = h.h;
+		}
+		i = Math.floor(h * 6);
+		f = h * 6 - i;
+		p = v * (1 - s);
+		q = v * (1 - f * s);
+		t = v * (1 - (1 - f) * s);
+		switch (i % 6) {
+			case 0: r = v, g = t, b = p; break;
+			case 1: r = q, g = v, b = p; break;
+			case 2: r = p, g = v, b = t; break;
+			case 3: r = p, g = q, b = v; break;
+			case 4: r = t, g = p, b = v; break;
+			case 5: r = v, g = p, b = q; break;
+		}
+		return {
+			r: r,
+			g: g,
+			b: b
+		};
+	}
+	
 	function xaCallBackIfReady(){
+		
 		if(xaNumOfDwnlds==0){
 			xaExternalCallBackFunc();
 		}
@@ -188,25 +216,19 @@ var xaGraphic = new function(){
 		
 		
 		xaDwnldXAM("models/player.xam", xaPlayersEntites);
-		function entityPusher(R,G,B)
+		function entityPusher(colorRGB)
 		{
 			var playerEntity = new Object();
 			playerEntity.position= vec3.create();
 			playerEntity.matrix = mat4.create();
 			playerEntity.isExistFlag=false;
-			playerEntity.color = new Float32Array(R,G,B);
+			playerEntity.color = new Float32Array([colorRGB.r,colorRGB.g, colorRGB.b]);
 			xaPlayersEntites.push(playerEntity);
 		}
-		entityPusher([1.0,0.0,0.0])  //1
-		entityPusher([255,153,0])//2
-		entityPusher([204,255,0])//3
-		entityPusher([51,255,0])//4
-		entityPusher([0,255,85])  //5
-		entityPusher([0,255,221])//6
-		entityPusher([0,153,255])  //7
-		entityPusher([0,17,255])  //8
-		entityPusher([119,0,255])  //9
-		entityPusher([255,0,255])  //10
+		
+		for (var i = 0; i < 10; i++) {
+			entityPusher(xa3dParty_HSVtoRGB(i*0.1,0.60,0.90)); 
+		}
 		
 		var img = xaDwnldTexture("textures/player.png",function(){
 			xaPlayersEntites.texIndx = xaGL.createTexture();
@@ -259,8 +281,8 @@ var xaGraphic = new function(){
 		xaConstObjects         = [];
 		xaPlayersEntites       = [];
 		xaNumOfDwnlds          = 0;
-		
-		xaSunPosition          = vec2.fromValues(0.4, 0.09);
+
+		xaSunPosition          = vec2.fromValues(0.087266,-2.356194);
 
 		//xaPushConstObj("models/cubemap8x8.xam");
 		xaSimpleTexturedShader = new Object();
@@ -322,9 +344,13 @@ var xaGraphic = new function(){
 		mat4.rotateX(resultMatrix, xaCamera.perspMat4, xaCamera.rotationX);
 		mat4.rotateY(resultMatrix, resultMatrix, xaCamera.rotationY);
 
-		var sunLightDirection=vec3.fromValues(0,0,1);
-		//vec3.rotateX(sunLightDirection, sunLightDirection, xaWorldCenter, xaSunPosition[0]);
-		//vec3.rotateY(sunLightDirection, sunLightDirection, xaWorldCenter, xaSunPosition[1]);
+		var sunLightDirection=vec3.fromValues(0,0,-1);
+		vec3.rotateX(sunLightDirection, sunLightDirection, xaWorldCenter, xaSunPosition[0]);
+		vec3.rotateY(sunLightDirection, sunLightDirection, xaWorldCenter, xaSunPosition[1]);
+		
+		xaGL.disableVertexAttribArray(2);
+		
+		
 		
 		xaGL.enableVertexAttribArray(0);
 		xaGL.activeTexture(xaGL.TEXTURE0);
@@ -366,7 +392,7 @@ var xaGraphic = new function(){
 			xaGL.drawElements(xaGL.TRIANGLES, xaConstObjects[i].numOfElems, xaGL.UNSIGNED_SHORT, 0);
 		}
 		//PLAYER_ENTITES
-		
+		xaGL.enableVertexAttribArray(2);
 		xaGL.useProgram(xaPlayersEntites.program);
 		xaGL.bindTexture(xaGL.TEXTURE_2D, xaPlayersEntites.texIndx);
 		xaGL.activeTexture(xaGL.TEXTURE1);
@@ -376,8 +402,9 @@ var xaGraphic = new function(){
 		xaGL.uniform3fv(xaPlayersEntites.sunDirLoc, sunLightDirection);
 		xaGL.bindBuffer(xaGL.ARRAY_BUFFER, xaPlayersEntites.arrBuff);
 		xaGL.bindBuffer(xaGL.ELEMENT_ARRAY_BUFFER, xaPlayersEntites.elemsBuff);
-		xaGL.vertexAttribPointer(0, 3, xaGL.FLOAT, xaGL.FALSE, Float32Array.BYTES_PER_ELEMENT * 5, 0);
-		xaGL.vertexAttribPointer(1, 2, xaGL.FLOAT, xaGL.FALSE, Float32Array.BYTES_PER_ELEMENT * 5, Float32Array.BYTES_PER_ELEMENT * 3)
+		xaGL.vertexAttribPointer(0, 3, xaGL.FLOAT, xaGL.FALSE, Float32Array.BYTES_PER_ELEMENT * 8, 0);
+		xaGL.vertexAttribPointer(1, 2, xaGL.FLOAT, xaGL.FALSE, Float32Array.BYTES_PER_ELEMENT * 8, Float32Array.BYTES_PER_ELEMENT * 3)
+		xaGL.vertexAttribPointer(2, 3, xaGL.FLOAT, xaGL.FALSE, Float32Array.BYTES_PER_ELEMENT * 8, Float32Array.BYTES_PER_ELEMENT * 5)
 		for (var i = 0; i < xaPlayersEntites.length; i++) {
 			if(xaPlayersEntites[i].isExistFlag===true){
 				xaGL.uniform3fv(xaPlayersEntites.skinColLoc, xaPlayersEntites[i].color);
@@ -403,7 +430,7 @@ var xaGraphic = new function(){
 	this.UpdatePlayerPosition   = function (inPlayerID, inPosition){
 		var player = xaPlayersEntites[inPlayerID];
 		vec3.copy(player.position, inPosition);
-		mat4.fromTranslation(player.matrix,inPosition);
+		mat4.fromTranslation(player.matrix,vec3.fromValues(-player.position[0],-player.position[1],-player.position[2]));
 	}
 	
 	
