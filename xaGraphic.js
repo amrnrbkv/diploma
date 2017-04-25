@@ -9,6 +9,7 @@ var xaGraphic = new function(){
 	var      xaDoublePI;
 	var      xaHalfPI;
 	var      xaWorldCenter;
+	var      xaSunPosition;
 	var      xaNumOfDwnlds;
 	var      xaExternalCallBackFunc;
 	var      xaSimpleTexturedShader;
@@ -220,13 +221,30 @@ var xaGraphic = new function(){
 			xaGL.generateMipmap(xaGL.TEXTURE_2D);
 		});
 		
+		var	img2 = xaDwnldTexture("textures/player_normal.png",function(){
+			xaPlayersEntites.normTexIndx = xaGL.createTexture();
+            xaGL.bindTexture(xaGL.TEXTURE_2D, xaPlayersEntites.normTexIndx);
+            xaGL.texParameteri(xaGL.TEXTURE_2D, xaGL.TEXTURE_WRAP_S, xaGL.REPEAT);
+            xaGL.texParameteri(xaGL.TEXTURE_2D, xaGL.TEXTURE_WRAP_T, xaGL.REPEAT);
+            xaGL.texParameteri(xaGL.TEXTURE_2D, xaGL.TEXTURE_MIN_FILTER, xaGL.LINEAR_MIPMAP_LINEAR);
+			
+			xaGL.texParameterf(xaGL.TEXTURE_2D, xaEXTanisotropic.TEXTURE_MAX_ANISOTROPY_EXT, 4);
+
+			xaGL.texImage2D (xaGL.TEXTURE_2D, 0, xaGL.RGB, xaGL.RGB, xaGL.UNSIGNED_BYTE, img2);
+			xaGL.generateMipmap(xaGL.TEXTURE_2D);
+		});
+		
+		
+		
 		xaPlayersEntites.program = xaGL.createProgram();
 		xaPrepareShaderPrg(xaCompileShader("playerVShader",xaGL.VERTEX_SHADER),
 						   xaCompileShader("playerFShader",xaGL.FRAGMENT_SHADER),
 						   xaPlayersEntites.program);
 		xaPlayersEntites.matLoc = xaGL.getUniformLocation(xaPlayersEntites.program, "matrix_");
 		xaPlayersEntites.texLoc = xaGL.getUniformLocation(xaPlayersEntites.program, "texture_");
+		xaPlayersEntites.normTexLoc = xaGL.getUniformLocation(xaPlayersEntites.program, "norm_texture_");
 		xaPlayersEntites.skinColLoc = xaGL.getUniformLocation(xaPlayersEntites.program, "skinColor");
+		xaPlayersEntites.sunDirLoc = xaGL.getUniformLocation(xaPlayersEntites.program, "sunDirection");
 		
 	}
 	
@@ -241,6 +259,8 @@ var xaGraphic = new function(){
 		xaConstObjects         = [];
 		xaPlayersEntites       = [];
 		xaNumOfDwnlds          = 0;
+		
+		xaSunPosition          = vec2.fromValues(0.4, 0.09);
 
 		//xaPushConstObj("models/cubemap8x8.xam");
 		xaSimpleTexturedShader = new Object();
@@ -287,6 +307,10 @@ var xaGraphic = new function(){
 			xaGL.viewport(0.0, 0.0, xaCanvas.width, xaCanvas.height);
 		};
 		
+		//SUN_DEBUG
+		vec2
+		//SUN_DEBUG_END
+		
 		//DEBUG
 		xaPlayersEntites[0].isExistFlag=true;
 		//DEBUG_END
@@ -295,12 +319,14 @@ var xaGraphic = new function(){
 		xaGL.clear(xaGL.COLOR_BUFFER_BIT | xaGL.DEPTH_BUFFER_BIT);
 		var resultMatrix = mat4.create();
 		var cameraMatrix = mat4.create();
-		mat4.rotateX(cameraMatrix, xaCamera.perspMat4, xaCamera.rotationX);
-		mat4.rotateY(cameraMatrix, cameraMatrix, xaCamera.rotationY);
-		mat4.translate(cameraMatrix, cameraMatrix, vec3.fromValues(-xaCamera.position[0], -xaCamera.position[1], -xaCamera.position[2]));
+		mat4.rotateX(resultMatrix, xaCamera.perspMat4, xaCamera.rotationX);
+		mat4.rotateY(resultMatrix, resultMatrix, xaCamera.rotationY);
 
-		xaGL.enableVertexAttribArray(0);
+		var sunLightDirection=vec3.fromValues(0,0,1);
+		//vec3.rotateX(sunLightDirection, sunLightDirection, xaWorldCenter, xaSunPosition[0]);
+		//vec3.rotateY(sunLightDirection, sunLightDirection, xaWorldCenter, xaSunPosition[1]);
 		
+		xaGL.enableVertexAttribArray(0);
 		xaGL.activeTexture(xaGL.TEXTURE0);
 		//SKYBOX
 		xaGL.disable(xaGL.DEPTH_TEST);
@@ -308,18 +334,15 @@ var xaGraphic = new function(){
 		xaGL.useProgram(xaSkyBoxShader.program);
 		xaGL.bindTexture(xaGL.TEXTURE_CUBE_MAP, xaSkyBox.texIndx);
 		xaGL.uniform1i(xaSkyBoxShader.texLoc, 0);
-		var debug =  mat4.clone(cameraMatrix);
-		debug[15]=1;
-		debug[14]=0;
-		debug[13]=0;
-		debug[12]=0;
 		
-		xaGL.uniformMatrix4fv(xaSkyBoxShader.matLoc, xaGL.FALSE, debug);
+		
+		xaGL.uniformMatrix4fv(xaSkyBoxShader.matLoc, xaGL.FALSE, resultMatrix);
 		xaGL.vertexAttribPointer(0, 3, xaGL.FLOAT, xaGL.FALSE, Float32Array.BYTES_PER_ELEMENT * 3, 0);
 		xaGL.drawArrays(xaGL.TRIANGLES, 0, 36);
 		
 		//
-		
+		mat4.translate(cameraMatrix, resultMatrix, vec3.fromValues(-xaCamera.position[0], -xaCamera.position[1], -xaCamera.position[2]));
+
 		
 		
 		//
@@ -346,7 +369,11 @@ var xaGraphic = new function(){
 		
 		xaGL.useProgram(xaPlayersEntites.program);
 		xaGL.bindTexture(xaGL.TEXTURE_2D, xaPlayersEntites.texIndx);
+		xaGL.activeTexture(xaGL.TEXTURE1);
+		xaGL.bindTexture(xaGL.TEXTURE_2D, xaPlayersEntites.normTexIndx);
 		xaGL.uniform1i(xaPlayersEntites.texLoc, 0);
+		xaGL.uniform1i(xaPlayersEntites.normTexLoc, 1);
+		xaGL.uniform3fv(xaPlayersEntites.sunDirLoc, sunLightDirection);
 		xaGL.bindBuffer(xaGL.ARRAY_BUFFER, xaPlayersEntites.arrBuff);
 		xaGL.bindBuffer(xaGL.ELEMENT_ARRAY_BUFFER, xaPlayersEntites.elemsBuff);
 		xaGL.vertexAttribPointer(0, 3, xaGL.FLOAT, xaGL.FALSE, Float32Array.BYTES_PER_ELEMENT * 5, 0);

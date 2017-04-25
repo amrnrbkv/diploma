@@ -143,8 +143,7 @@ var start = function() {
     //PointerLock API --- End
 
 	//DEBUG
-	xaGraphic.MoveCamera(vec3.fromValues(0,1,0));
-	xaGraphic.RotateCamera(0.5,0.9);
+
 
 	xaUI.SetFPSCounter(true);
 
