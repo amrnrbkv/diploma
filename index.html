@@ -7,7 +7,7 @@
   <body>
 
 
-    <div id="win">
+    <div id="win" style = 'display: none;'>
        <div class="overlay"></div>
           <div class="visible">
             <h2>Outside the ring</h2>
@@ -56,8 +56,8 @@
 
     </script>
 
-	
-	
+
+
 	<script id="playerVShader" type="glsl">
 
       attribute vec3 a_vertex; // vertex position
@@ -126,11 +126,11 @@
 		}
 	</script>
 
+    <script src="gl-matrix-min.js"></script>
 
-    <script src="main.js"></script>
-	  <script src="gl-matrix-min.js"></script>
 	  <script src="xaGraphic.js"></script>
 	  <script src="xaUI.js"></script>
+    <script src="main.js"></script>
 
   </body>
 </html>
