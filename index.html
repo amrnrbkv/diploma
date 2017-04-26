@@ -30,12 +30,15 @@
 
       attribute vec3 a_vertex; // vertex position
       attribute vec2 tex_;
+	  attribute vec3 inNormal;
       varying vec2 temp_;
+	  varying vec3 outNormal;
       uniform mat4 matrix_;
 
       void main(void){
         gl_Position = matrix_ * vec4(a_vertex, 1.0);
         temp_ = tex_;
+		outNormal=inNormal;
       }
 
 
@@ -47,10 +50,13 @@
 
       precision mediump float;
       varying vec2 temp_;
+	  varying vec3 outNormal;
       uniform sampler2D texture_;
+	  uniform vec3 sunDirection;
 
       void main (void){
-        gl_FragColor = texture2D(texture_, temp_);
+		float product = max(dot(sunDirection,outNormal),0.0);
+        gl_FragColor =  vec4(texture2D(texture_, temp_).rgb*product,1.0);
       }
 
 

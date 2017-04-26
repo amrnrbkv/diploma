@@ -294,6 +294,8 @@ var xaGraphic = new function(){
 						   xaSimpleTexturedShader.program);
 		xaSimpleTexturedShader.matLoc  = xaGL.getUniformLocation(xaSimpleTexturedShader.program, "matrix_");
 		xaSimpleTexturedShader.texLoc  = xaGL.getUniformLocation(xaSimpleTexturedShader.program, "texture_");
+		xaSimpleTexturedShader.normTexLoc = xaGL.getUniformLocation(xaSimpleTexturedShader.program, "norm_texture_");
+		xaSimpleTexturedShader.sunDirLoc = xaGL.getUniformLocation(xaSimpleTexturedShader.program, "sunDirection");
 		
 		xaPrepareSkyBox();
 		xaSkyBoxShader.program = xaGL.createProgram();
@@ -302,6 +304,7 @@ var xaGraphic = new function(){
 						   xaSkyBoxShader.program);
 		xaSkyBoxShader.matLoc = xaGL.getUniformLocation(xaSkyBoxShader.program, "projection");
 		xaSkyBoxShader.texLoc = xaGL.getUniformLocation(xaSkyBoxShader.program, "skybox");
+		
 		
 		
 		xaWorldCenter       = vec3.fromValues(0,0,0);
@@ -316,6 +319,7 @@ var xaGraphic = new function(){
 		
 		xaPreparePlayersEntites();
 		xaCreateConstObj("models/ring1.xam","textures/ring1.png");
+		xaCreateConstObj("models/wall.xam","textures/wall.png");
 		
 		
 		
@@ -348,7 +352,7 @@ var xaGraphic = new function(){
 		vec3.rotateX(sunLightDirection, sunLightDirection, xaWorldCenter, xaSunPosition[0]);
 		vec3.rotateY(sunLightDirection, sunLightDirection, xaWorldCenter, xaSunPosition[1]);
 		
-		xaGL.disableVertexAttribArray(2);
+		//xaGL.disableVertexAttribArray(2);
 		
 		
 		
@@ -374,25 +378,27 @@ var xaGraphic = new function(){
 		//
 		
 		xaGL.enableVertexAttribArray(1);
-		
+		xaGL.enableVertexAttribArray(2);
 		//
-		xaGL.vertexAttribPointer(0, 3, xaGL.FLOAT, xaGL.FALSE, Float32Array.BYTES_PER_ELEMENT * 5, 0);
-		xaGL.vertexAttribPointer(1, 2, xaGL.FLOAT, xaGL.FALSE, Float32Array.BYTES_PER_ELEMENT * 5, Float32Array.BYTES_PER_ELEMENT * 3)
+		
+		
 		//
 		xaGL.enable(xaGL.DEPTH_TEST);
 		xaGL.useProgram(xaSimpleTexturedShader.program);
+		xaGL.uniform3fv(xaSimpleTexturedShader.sunDirLoc, sunLightDirection);
 		for (var i = 0; i < xaConstObjects.length; i++) {
 			xaGL.bindTexture(xaGL.TEXTURE_2D, xaConstObjects[i].texIndx);
 			xaGL.uniform1i(xaSimpleTexturedShader.texLoc, 0);
 			xaGL.uniformMatrix4fv(xaSimpleTexturedShader.matLoc, xaGL.FALSE, cameraMatrix);
 			xaGL.bindBuffer(xaGL.ARRAY_BUFFER, xaConstObjects[i].arrBuff);
 			xaGL.bindBuffer(xaGL.ELEMENT_ARRAY_BUFFER, xaConstObjects[i].elemsBuff);
-			xaGL.vertexAttribPointer(0, 3, xaGL.FLOAT, xaGL.FALSE, Float32Array.BYTES_PER_ELEMENT * 5, 0);
-			xaGL.vertexAttribPointer(1, 2, xaGL.FLOAT, xaGL.FALSE, Float32Array.BYTES_PER_ELEMENT * 5, Float32Array.BYTES_PER_ELEMENT * 3)
+			xaGL.vertexAttribPointer(0, 3, xaGL.FLOAT, xaGL.FALSE, Float32Array.BYTES_PER_ELEMENT * 8, 0);
+		xaGL.vertexAttribPointer(1, 2, xaGL.FLOAT, xaGL.FALSE, Float32Array.BYTES_PER_ELEMENT * 8, Float32Array.BYTES_PER_ELEMENT * 3)
+		xaGL.vertexAttribPointer(2, 3, xaGL.FLOAT, xaGL.FALSE, Float32Array.BYTES_PER_ELEMENT * 8, Float32Array.BYTES_PER_ELEMENT * 5)
 			xaGL.drawElements(xaGL.TRIANGLES, xaConstObjects[i].numOfElems, xaGL.UNSIGNED_SHORT, 0);
 		}
 		//PLAYER_ENTITES
-		xaGL.enableVertexAttribArray(2);
+
 		xaGL.useProgram(xaPlayersEntites.program);
 		xaGL.bindTexture(xaGL.TEXTURE_2D, xaPlayersEntites.texIndx);
 		xaGL.activeTexture(xaGL.TEXTURE1);
