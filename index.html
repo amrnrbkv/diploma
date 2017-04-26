@@ -53,10 +53,12 @@
 	  varying vec3 outNormal;
       uniform sampler2D texture_;
 	  uniform vec3 sunDirection;
+	  uniform vec3 sunColor;
+	  uniform vec3 ambientColor;
 
       void main (void){
 		float product = max(dot(sunDirection,outNormal),0.0);
-        gl_FragColor =  vec4(texture2D(texture_, temp_).rgb*product,1.0);
+        gl_FragColor = vec4((ambientColor + sunColor * product)*texture2D(texture_, temp_).rgb,1.0);
       }
 
 
