@@ -271,7 +271,8 @@ var xaGraphic = new function(){
 		xaPlayersEntites.normTexLoc = xaGL.getUniformLocation(xaPlayersEntites.program, "norm_texture_");
 		xaPlayersEntites.skinColLoc = xaGL.getUniformLocation(xaPlayersEntites.program, "skinColor");
 		xaPlayersEntites.sunDirLoc = xaGL.getUniformLocation(xaPlayersEntites.program, "sunDirection");
-		
+		xaPlayersEntites.sunColLoc = xaGL.getUniformLocation(xaPlayersEntites.program, "sunColor");
+		xaPlayersEntites.ambColLoc = xaGL.getUniformLocation(xaPlayersEntites.program, "ambientColor");
 	}
 	
 
@@ -417,6 +418,8 @@ var xaGraphic = new function(){
 		xaGL.uniform1i(xaPlayersEntites.texLoc, 0);
 		xaGL.uniform1i(xaPlayersEntites.normTexLoc, 1);
 		xaGL.uniform3fv(xaPlayersEntites.sunDirLoc, sunLightDirection);
+		xaGL.uniform3fv(xaPlayersEntites.sunColLoc, xaSunColor);
+		xaGL.uniform3fv(xaPlayersEntites.ambColLoc, xaAmbientColor);
 		xaGL.bindBuffer(xaGL.ARRAY_BUFFER, xaPlayersEntites.arrBuff);
 		xaGL.bindBuffer(xaGL.ELEMENT_ARRAY_BUFFER, xaPlayersEntites.elemsBuff);
 		xaGL.vertexAttribPointer(0, 3, xaGL.FLOAT, xaGL.FALSE, Float32Array.BYTES_PER_ELEMENT * 8, 0);

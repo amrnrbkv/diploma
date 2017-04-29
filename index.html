@@ -95,13 +95,15 @@
 	  uniform sampler2D norm_texture_;
 	  uniform vec3 skinColor;
 	  uniform vec3 sunDirection;
+	  uniform vec3 sunColor;
+	  uniform vec3 ambientColor;
 
       void main (void){
 		vec4 texColor  = texture2D(texture_, temp_);
 		vec3 nominalColor = mix(skinColor,texColor.rgb,texColor.a);
 		vec3 norm  = texture2D(norm_texture_, temp_).rgb* 2.0 - 1.0;
 		float product = max(dot(sunDirection,outNormal),0.0);
-        gl_FragColor =  vec4(nominalColor*product,1.0);
+        gl_FragColor =  vec4((ambientColor + sunColor * product)*nominalColor,1.0);
       }
 
 
