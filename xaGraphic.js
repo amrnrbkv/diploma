@@ -20,7 +20,7 @@ var xaGraphic = new function(){
 	var      xaSkyBoxShader;
 	
 	function xa3dParty_HSVtoRGB(h, s, v) {
-		//Written by Parthik Gosar,
+		//HSVtoRGB is written by Parthik Gosar,
 		//Modified by stackoverflow user Paul S.
 		var r, g, b, i, f, p, q, t;
 		if (arguments.length === 1) {
@@ -47,8 +47,9 @@ var xaGraphic = new function(){
 	}
 	
 	function xaCallBackIfReady(){
-		
 		if(xaNumOfDwnlds==0){
+			//PreRender operations
+			
 			xaExternalCallBackFunc();
 		}
 	}
