@@ -353,7 +353,7 @@ var start = function() {
             }
 			xaGraphic.MoveCamera(cameraDislocation);
 			xaGraphic.RotateCamera(onXDegree,onYDegree);
-			xaGraphic.RenderFrame();
+			//xaGraphic.RenderFrame();
 
 
 
