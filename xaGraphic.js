@@ -12,6 +12,7 @@ var xaGraphic = new function(){
 	//LIGHTING
 	var      xaSunPosition;
 	var		 xaSunColor;
+	var      xaHemisphereColor;
 	var		 xaAmbientColor;
 	//LIGHTING END
 	var      xaNumOfDwnlds;
@@ -327,8 +328,10 @@ var xaGraphic = new function(){
 
 		//LIGHTING
 		xaSunPosition          = vec2.fromValues(0.087266,-2.356194);
-		xaSunColor			   = vec3.fromValues(0.65,0.41,0.3);
-		xaAmbientColor		   = vec3.fromValues(0.54, 0.45,0.45);
+		xaSunColor			   = vec3.fromValues(0.75,0.41,0.3);
+		xaHemisphereColorUp     = vec3.fromValues(0.55,0.52,0.7);
+		xaHemisphereColorBottom = vec3.fromValues(0.31,0.3,0.35);
+		xaAmbientColor		   = vec3.fromValues(0.0, 0.0,0.0);
 		//LIGHTING_END
 		//xaPushConstObj("models/cubemap8x8.xam");
 		xaSimpleTexturedShader = new Object();
@@ -343,6 +346,8 @@ var xaGraphic = new function(){
 		xaSimpleTexturedShader.normTexLoc = xaGL.getUniformLocation(xaSimpleTexturedShader.program, "norm_texture_");
 		xaSimpleTexturedShader.sunDirLoc = xaGL.getUniformLocation(xaSimpleTexturedShader.program, "sunDirection");
 		xaSimpleTexturedShader.sunColLoc = xaGL.getUniformLocation(xaSimpleTexturedShader.program, "sunColor");
+		xaSimpleTexturedShader.hemiColLocUp = xaGL.getUniformLocation(xaSimpleTexturedShader.program, "hemisphereColorUp");
+		xaSimpleTexturedShader.hemiColLocBottom = xaGL.getUniformLocation(xaSimpleTexturedShader.program, "hemisphereColorBottom");
 		xaSimpleTexturedShader.ambColLoc = xaGL.getUniformLocation(xaSimpleTexturedShader.program, "ambientColor");
 
 		
@@ -367,8 +372,9 @@ var xaGraphic = new function(){
 
 		
 		xaPreparePlayersEntites();
-		//xaCreateConstObj("models/ring1.xam","textures/ring1.png","textures/wall_normal.png");
 		xaCreateConstObj("models/wall.xam","textures/wall.png","textures/wall_normal.png");
+		xaCreateConstObj("models/ring.xam","textures/ring.png","textures/ring_normal.png");
+		
 		
 		
 		
@@ -438,8 +444,11 @@ var xaGraphic = new function(){
 		xaGL.useProgram(xaSimpleTexturedShader.program);
 		xaGL.uniform3fv(xaSimpleTexturedShader.sunDirLoc, sunLightDirection);
 		xaGL.uniform3fv(xaSimpleTexturedShader.sunColLoc, xaSunColor);
+		xaGL.uniform3fv(xaSimpleTexturedShader.hemiColLocUp, xaHemisphereColorUp);
+		xaGL.uniform3fv(xaSimpleTexturedShader.hemiColLocBottom, xaHemisphereColorBottom);
 		xaGL.uniform3fv(xaSimpleTexturedShader.ambColLoc, xaAmbientColor);
 		for (var i = 0; i < xaConstObjects.length; i++) {
+			xaGL.activeTexture(xaGL.TEXTURE0);
 			xaGL.bindTexture(xaGL.TEXTURE_2D, xaConstObjects[i].texIndx);
 			xaGL.activeTexture(xaGL.TEXTURE1);
 			xaGL.bindTexture(xaGL.TEXTURE_2D, xaConstObjects[i].normTexIndx);

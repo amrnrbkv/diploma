@@ -53,6 +53,9 @@
     <script id="fShader" type="glsl">
 
       precision mediump float;
+	  
+	  const vec3 upVector = vec3(0.0,1.0,0.0);
+	  
       varying vec2 outTexCoor;
 	  varying mat3 outTBN;
 	  //varying vec3 outDebug;
@@ -60,14 +63,19 @@
 	  uniform sampler2D norm_texture_;
 	  uniform vec3 sunDirection;
 	  uniform vec3 sunColor;
+	  uniform vec3 hemisphereColorUp;
+	  uniform vec3 hemisphereColorBottom;
 	  uniform vec3 ambientColor;
 
       void main (void){
 		vec3 normal = texture2D(norm_texture_, outTexCoor).rgb;
 		normal = normalize(2.0*(normal-0.5));
 		normal = normalize(outTBN*normal);
-		float sunStrength = max(dot(sunDirection,normal),0.0);
-        gl_FragColor = vec4((ambientColor + sunColor * sunStrength)*texture2D(texture_, outTexCoor).rgb ,1.0);
+		float hemiStrength = 0.5 + 0.5 * dot(normal,upVector);
+		vec3 hemiValue = hemisphereColorUp * hemiStrength + hemisphereColorBottom * (1.0-hemiStrength);
+		vec3 sunValue = sunColor * max(dot(sunDirection,normal),0.0);
+		
+        gl_FragColor = vec4((ambientColor + sunValue + hemiValue)*texture2D(texture_, outTexCoor).rgb ,1.0);
 		
       }
 
@@ -115,8 +123,6 @@
 		float product = max(dot(sunDirection,outNormal),0.0);
         gl_FragColor =  vec4((ambientColor + sunColor * product)*nominalColor,1.0);
       }
-
-
     </script>
 
 
