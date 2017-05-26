@@ -329,8 +329,8 @@ var xaGraphic = new function(){
 		//LIGHTING
 		xaSunPosition          = vec2.fromValues(0.087266,-2.356194);
 		xaSunColor			   = vec3.fromValues(0.75,0.41,0.3);
-		xaHemisphereColorUp     = vec3.fromValues(0.55,0.52,0.7);
-		xaHemisphereColorBottom = vec3.fromValues(0.31,0.3,0.35);
+		xaHemisphereColorUp     = vec3.fromValues(0.45,0.42,0.5);
+		xaHemisphereColorBottom = vec3.fromValues(0.21,0.2,0.25);
 		xaAmbientColor		   = vec3.fromValues(0.0, 0.0,0.0);
 		//LIGHTING_END
 		//xaPushConstObj("models/cubemap8x8.xam");
